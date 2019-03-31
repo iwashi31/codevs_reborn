@@ -67,10 +67,6 @@ private:
     // ブロックの消滅が発生すれば true, 発生しなければ false を返す
     bool eraseBlocks();
 
-    // 点 (x, y) から指定された方向に和を取ったときに ERASE_SUM に一致するか調べる
-    // 一致する場合ブロック数を、一致しない場合 -1 を返す
-    int checkSum(int x, int y, Direction direction);
-
     // 点 (x, y) がフィールド内の点か否かを返す
     bool inField(int x, int y);
 

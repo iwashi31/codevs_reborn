@@ -449,13 +449,14 @@ bool Field::eraseBlocks() {
     rep(y, field.size()) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0) continue;
         rep(directionIdx, 4) {
-            int num = checkSum(x, y, static_cast<Direction>(directionIdx));
-            int ix = x;
-            int iy = y;
-            rep(i, num) {
+            int ix = x + DX[directionIdx];
+            int iy = y + DY[directionIdx];
+            if (!inField(ix, iy)) continue;
+
+            int sum = field[y][x] + field[iy][ix];
+            if (sum == ERASE_SUM) {
+                erasedPoints.emplace_back(x, y);
                 erasedPoints.emplace_back(ix, iy);
-                ix += DX[directionIdx];
-                iy += DY[directionIdx];
             }
         }
     }
@@ -466,21 +467,6 @@ bool Field::eraseBlocks() {
     }
 
     return !erasedPoints.empty();
-}
-
-int Field::checkSum(int x, int y, Direction direction) {
-    int directionIdx = static_cast<int>(direction);
-    int i = 0;
-    int sum = 0;
-    while (inField(x, y)) {
-        if (field[y][x] == 0) break;
-        sum += field[y][x];
-        if (sum >= ERASE_SUM) break;
-        i++;
-        x += DX[directionIdx];
-        y += DY[directionIdx];
-    }
-    return sum == ERASE_SUM ? i + 1 : -1;
 }
 
 bool Field::inField(int x, int y) {
@@ -539,6 +525,7 @@ void Player::input(istream& is) {
     is >> leftTime;
     is >> obstacleStock;
     is >> skillGage;
+    for (int y = FIELD_HEIGHT + PACK_SIZE - 1; y >= FIELD_HEIGHT; y--) rep(x, FIELD_WIDTH) field[y][x] = 0;
     for (int y = FIELD_HEIGHT - 1; y >= 0; y--) rep(x, FIELD_WIDTH) is >> field[y][x];
     string end;
     is >> end;
@@ -546,7 +533,7 @@ void Player::input(istream& is) {
 
 void Game::inputPackInfo(istream& is) {
     string end;
-    for (auto pack : packs) {
+    for (auto& pack : packs) {
         for (int y = PACK_SIZE - 1; y >= 0; y--) rep(x, PACK_SIZE) is >> pack[y][x];
         is >> end;
     }
