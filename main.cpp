@@ -1,7 +1,7 @@
 #include "common.h"
 #include "strategy/randomStrategy.h"
 
-int main() {
+int main(int argc, char* argv[]) {
     IStrategy* strategy = new RandomStrategy();
     cout << strategy->getName() << endl;
     cout.flush();

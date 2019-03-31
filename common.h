@@ -4,7 +4,11 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <cstring>
 #include <array>
+#include <vector>
+#include <algorithm>
+#include <cassert>
 
 using namespace std;
 
@@ -13,51 +17,91 @@ using namespace std;
 #define all(a) (a).begin(), (a).end()
 #define mp(a, b) make_pair((a), (b))
 
-const int PACK_SIZE = 2;
-const int FIELD_HEIGHT = 16;
-const int FIELD_WIDTH = 10;
-const int MAX_TURN_NUM = 500;
-const int SKILL_GAGE_THRESHOLD = 80;
+const int PACK_SIZE = 2;                // パックの大きさ
+const int FIELD_HEIGHT = 16;            // フィールドの高さ
+const int FIELD_WIDTH = 10;             // フィールドの幅
+const int MAX_TURN_NUM = 500;           // 最大ターン数
+const int ERASE_SUM = 10;               // 消滅する和の数
+const int SKILL_GAGE_THRESHOLD = 80;    // スキル使用可能になるゲージのしきい値
+const int INCREMENT_SKILL_GAGE = 8;     // ブロック消滅時のスキルゲージ増加量
+
+const int DX[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+const int DY[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+enum class Direction {
+    RIGHT = 0,
+    TOP_RIGHT = 1,
+    TOP = 2,
+    TOP_LEFT = 3,
+    LEFT = 4,
+    BOTTOM_LEFT = 5,
+    BOTTOM = 6,
+    BOTTOM_RIGHT = 7
+};
+
+extern const int DECREMENT_SKILL_GAGE[];    // 敵の連鎖によるスキルゲージの減少量
+extern const long long CHAIN_SCORE[];       // 通常チェインスコア
+extern const long long SKILL_CHAIN_SCORE[]; // スキルチェインスコア
+extern const int EXPLODE_SCORE[];           // 爆発スコア
 
 using Pack = array<array<int, PACK_SIZE>, PACK_SIZE>;
-using Field = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT>;
+using RowField = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT + PACK_SIZE>;
+
+class Point {
+public:
+    int x{}, y{};
+
+    Point();
+    Point(int x, int y);
+};
+
+class Field {
+private:
+    RowField field{};
+    bool columnUpdated[FIELD_WIDTH]{};  // 自由落下時、このフラグが立っている列のみ計算する
+
+    // ブロックを自由落下させ、デンジャーラインを超えなければ true, 超えれば false を返す
+    bool freeFall();
+
+    // 消えるブロックを消す
+    // ブロックの消滅が発生すれば true, 発生しなければ false を返す
+    bool eraseBlocks();
+
+    // 点 (x, y) から指定された方向に和を取ったときに ERASE_SUM に一致するか調べる
+    // 一致する場合ブロック数を、一致しない場合 -1 を返す
+    int checkSum(int x, int y, Direction direction);
+
+    // 点 (x, y) がフィールド内の点か否かを返す
+    bool inField(int x, int y);
+
+public:
+    Field();
+
+    // パックを指定の位置に落とす
+    // 返り値は連鎖数。ただし、デンジャーゾーンを超えた場合 -1 が返る
+    int dropPack(const Pack& pack, int position, int rotation);
+
+    array<int, FIELD_WIDTH>& operator[](int idx);
+};
 
 class Player {
 public:
-    int leftTime;
-    int obstacleStock;
-    int skillGage;
+    int leftTime{};
+    int obstacleStock{};
+    int skillGage{};
     Field field;
 
-    void input(istream& is) {
-        is >> leftTime;
-        is >> obstacleStock;
-        is >> skillGage;
-        rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) is >> field[y][x];
-        string end;
-        is >> end;
-    }
+    void input(istream& is);
 };
 
 class Game {
 public:
-    int turn;
-    Pack packs[MAX_TURN_NUM];
+    int turn{};
+    Pack packs[MAX_TURN_NUM]{};
     Player player[2];
 
-    void inputPackInfo(istream& is) {
-        string end;
-        for (auto pack : packs) {
-            rep(y, PACK_SIZE) rep(x, PACK_SIZE) is >> pack[y][x];
-            is >> end;
-        }
-    }
-
-    void inputTurnInfo(istream& is) {
-        is >> turn;
-        player[0].input(is);
-        player[1].input(is);
-    }
+    void inputPackInfo(istream& is);
+    void inputTurnInfo(istream& is);
 };
 
 enum class ActionType {
@@ -71,31 +115,13 @@ public:
     int position;
     int rotation;
 
-    static Action createDropPackAction(int position, int rotation) {
-        Action action{};
-        action.type = ActionType::DROP_PACK;
-        action.position = position;
-        action.rotation = rotation;
-        return action;
-    }
-
-    static Action createExplodeAction() {
-        Action action{};
-        action.type = ActionType::EXPLODE;
-        return action;
-    }
+    static Action createDropPackAction(int position, int rotation);
+    static Action createExplodeAction();
 };
 
 class IStrategy {
 protected:
-    unsigned long randXor() {
-        static unsigned long x = 123456789, y = 362436069, z = 521288629, w = 88675123;
-        unsigned long t = (x ^ (x << 11));
-        x = y;
-        y = z;
-        z = w;
-        return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
-    }
+    unsigned long randXor();
 
 public:
     virtual string getName() = 0;
