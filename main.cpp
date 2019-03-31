@@ -1,8 +1,10 @@
 #include "common.h"
 #include "strategy/randomStrategy.h"
+#include "strategy/simpleStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new RandomStrategy();
+    IStrategy* strategy = new SimpleStrategy();
+
     cout << strategy->getName() << endl;
     cout.flush();
 

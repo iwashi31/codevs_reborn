@@ -67,15 +67,17 @@ private:
     // ブロックの消滅が発生すれば true, 発生しなければ false を返す
     bool eraseBlocks();
 
-    // 点 (x, y) がフィールド内の点か否かを返す
-    bool inField(int x, int y);
-
 public:
     Field();
 
     // パックを指定の位置に落とす
     // 返り値は連鎖数。ただし、デンジャーゾーンを超えた場合 -1 が返る
     int dropPack(const Pack& pack, int position, int rotation);
+
+    // 点 (x, y) がフィールド内の点か否かを返す
+    bool inField(int x, int y);
+
+    void print(ostream& os);
 
     array<int, FIELD_WIDTH>& operator[](int idx);
 };
@@ -115,6 +117,7 @@ public:
     static Action createExplodeAction();
 };
 
+// AI の思考はこのクラスを継承し、getAction(Game&) として記述する
 class IStrategy {
 protected:
     unsigned long randXor();

@@ -432,7 +432,7 @@ bool Field::freeFall() {
         rep(y, field.size()) {
             if (field[y][x] != 0) {
                 field[bottom][x] = field[y][x];
-                field[y][x] = 0;
+                if (bottom != y) field[y][x] = 0;
                 bottom++;
             }
         }
@@ -515,6 +515,15 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
     }
 
     return chains;
+}
+
+void Field::print(ostream& os) {
+    for (int y = field.size() - 1; y >= 0; y--) {
+        rep(x, FIELD_WIDTH) {
+            os << field[y][x] << " ";
+        }
+        os << endl;
+    }
 }
 
 array<int, FIELD_WIDTH>& Field::operator[](int idx) {
