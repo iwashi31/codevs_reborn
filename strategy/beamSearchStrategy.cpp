@@ -10,7 +10,7 @@ bool BeamSearchStrategy::State::operator<(const BeamSearchStrategy::State &a) co
 BeamSearchStrategy::BeamSearchStrategy() : game(nullptr) {}
 
 string BeamSearchStrategy::getName() {
-    return "iwashiAI_v1.0";
+    return "iwashiAI_v1.1";
 }
 
 Action BeamSearchStrategy::getAction(Game &game) {
@@ -43,6 +43,7 @@ Action BeamSearchStrategy::beamSearch(int depth, unsigned width) {
         if (nextPool.size() > width) nextPool.resize(width);
         swap(pool, nextPool);
         turn++;
+        if (turn == MAX_TURN_NUM) break;
     }
 
     State& bestState = pool[0];
