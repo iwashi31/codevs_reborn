@@ -1,11 +1,11 @@
-#ifndef CODEVS_REBORN_SIMPLESTRATEGY_H
-#define CODEVS_REBORN_SIMPLESTRATEGY_H
+#ifndef CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
+#define CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
 
 #include "../common.h"
 
 // 敵の状態は無視して、自分のスコアを最大化するように動く Strategy
 // 中身はビームサーチ
-class SimpleStrategy : public IStrategy {
+class BeamSearchStrategy : public IStrategy {
 private:
     struct State {
         Field field;
@@ -30,10 +30,10 @@ private:
     int calcFieldScore(Field& field);
 
 public:
-    SimpleStrategy();
+    BeamSearchStrategy();
 
     string getName() override;
     Action getAction(Game& game) override;
 };
 
-#endif //CODEVS_REBORN_SIMPLESTRATEGY_H
+#endif //CODEVS_REBORN_BEAMSEARCHSTRATEGY_H

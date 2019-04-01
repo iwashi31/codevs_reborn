@@ -4,4 +4,4 @@ project(codevs_reborn)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-static")
 
-add_executable(codevs_reborn main.cpp strategy/randomStrategy.h common.h strategy/simpleStrategy.h strategy/randomStrategy.cpp strategy/simpleStrategy.cpp common.cpp)
+add_executable(codevs_reborn main.cpp strategy/randomStrategy.h common.h strategy/beamSearchStrategy.h strategy/randomStrategy.cpp strategy/beamSearchStrategy.cpp common.cpp)

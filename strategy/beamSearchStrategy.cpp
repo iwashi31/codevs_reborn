@@ -1,25 +1,25 @@
 #include "../common.h"
-#include "simpleStrategy.h"
+#include "beamSearchStrategy.h"
 
-SimpleStrategy::State::State() = default;
-SimpleStrategy::State::State(Field& field, int score) : field(field), score(score) {}
-bool SimpleStrategy::State::operator<(const SimpleStrategy::State &a) const {
+BeamSearchStrategy::State::State() = default;
+BeamSearchStrategy::State::State(Field& field, int score) : field(field), score(score) {}
+bool BeamSearchStrategy::State::operator<(const BeamSearchStrategy::State &a) const {
     return score > a.score;
 }
 
-SimpleStrategy::SimpleStrategy() : game(nullptr) {}
+BeamSearchStrategy::BeamSearchStrategy() : game(nullptr) {}
 
-string SimpleStrategy::getName() {
+string BeamSearchStrategy::getName() {
     return "iwashiAI_v1.0";
 }
 
-Action SimpleStrategy::getAction(Game &game) {
+Action BeamSearchStrategy::getAction(Game &game) {
     this->game = &game;
 
     return beamSearch(5, 300);
 }
 
-Action SimpleStrategy::beamSearch(int depth, unsigned width) {
+Action BeamSearchStrategy::beamSearch(int depth, unsigned width) {
     int turn = game->turn;
     vector<State> pool;
     pool.emplace_back(game->player[0].field, 0);
@@ -57,7 +57,7 @@ Action SimpleStrategy::beamSearch(int depth, unsigned width) {
     return bestAction;
 }
 
-int SimpleStrategy::calcFieldScore(Field& field) {
+int BeamSearchStrategy::calcFieldScore(Field& field) {
     int score = 0;
 
     // 連鎖に繋がりそうな位置関係の組み合わせがあれば加点

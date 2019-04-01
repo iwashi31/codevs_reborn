@@ -1,9 +1,9 @@
 #include "common.h"
 #include "strategy/randomStrategy.h"
-#include "strategy/simpleStrategy.h"
+#include "strategy/beamSearchStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new SimpleStrategy();
+    IStrategy* strategy = new BeamSearchStrategy();
 
     cout << strategy->getName() << endl;
     cout.flush();
