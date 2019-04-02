@@ -7,6 +7,7 @@
 #include <cstring>
 #include <array>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include <cassert>
 
@@ -21,6 +22,7 @@ const int PACK_SIZE = 2;                // パックの大きさ
 const int FIELD_HEIGHT = 16;            // フィールドの高さ
 const int FIELD_WIDTH = 10;             // フィールドの幅
 const int MAX_TURN_NUM = 500;           // 最大ターン数
+const int EXPLODE_NUM = 5;              // 爆発するブロックの数字
 const int ERASE_SUM = 10;               // 消滅する和の数
 const int SKILL_GAGE_THRESHOLD = 80;    // スキル使用可能になるゲージのしきい値
 const int INCREMENT_SKILL_GAGE = 8;     // ブロック消滅時のスキルゲージ増加量
@@ -115,6 +117,21 @@ public:
 
     static Action createDropPackAction(int position, int rotation);
     static Action createExplodeAction();
+};
+
+class Timer {
+    unsigned long long beginCycle;
+
+    unsigned long long getCycle() {
+        unsigned int low, high;
+        __asm__ volatile ("rdtsc" : "=a" (low), "=d" (high));
+        return ((unsigned long long int)low) | ((unsigned long long int)high << 32);
+    }
+
+public:
+    Timer();
+
+    double getTime();
 };
 
 // AI の思考はこのクラスを継承し、getAction(Game&) として記述する

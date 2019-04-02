@@ -1,25 +1,25 @@
 #include "../common.h"
-#include "beamSearchStrategy.h"
+#include "onlyChainStrategy.h"
 
-BeamSearchStrategy::State::State() = default;
-BeamSearchStrategy::State::State(Field& field, int score) : field(field), score(score) {}
-bool BeamSearchStrategy::State::operator<(const BeamSearchStrategy::State &a) const {
+OnlyChainStrategy::State::State() = default;
+OnlyChainStrategy::State::State(Field& field, int score) : field(field), score(score) {}
+bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) const {
     return score > a.score;
 }
 
-BeamSearchStrategy::BeamSearchStrategy() : game(nullptr) {}
+OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
-string BeamSearchStrategy::getName() {
+string OnlyChainStrategy::getName() {
     return "iwashiAI_v1.1";
 }
 
-Action BeamSearchStrategy::getAction(Game &game) {
+Action OnlyChainStrategy::getAction(Game &game) {
     this->game = &game;
 
     return beamSearch(5, 300);
 }
 
-Action BeamSearchStrategy::beamSearch(int depth, unsigned width) {
+Action OnlyChainStrategy::beamSearch(int depth, unsigned width) {
     int turn = game->turn;
     vector<State> pool;
     pool.emplace_back(game->player[0].field, 0);
@@ -58,7 +58,7 @@ Action BeamSearchStrategy::beamSearch(int depth, unsigned width) {
     return bestAction;
 }
 
-int BeamSearchStrategy::calcFieldScore(Field& field) {
+int OnlyChainStrategy::calcFieldScore(Field& field) {
     int score = 0;
 
     // 連鎖に繋がりそうな位置関係の組み合わせがあれば加点

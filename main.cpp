@@ -1,9 +1,10 @@
 #include "common.h"
 #include "strategy/randomStrategy.h"
-#include "strategy/beamSearchStrategy.h"
+#include "strategy/onlyChainStrategy.h"
+#include "strategy/prioritizeSkillStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new BeamSearchStrategy();
+    IStrategy* strategy = new PrioritizeSkillStrategy();
 
     cout << strategy->getName() << endl;
     cout.flush();

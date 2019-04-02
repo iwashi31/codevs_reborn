@@ -568,6 +568,14 @@ Action Action::createExplodeAction() {
     return action;
 }
 
+Timer::Timer() {
+    beginCycle = getCycle();
+}
+
+double Timer::getTime() {
+    return (double)(getCycle() - beginCycle) / 2500000000;
+}
+
 unsigned long IStrategy::randXor() {
     static unsigned long x = 123456789, y = 362436069, z = 521288629, w = 88675123;
     unsigned long t = (x ^ (x << 11));

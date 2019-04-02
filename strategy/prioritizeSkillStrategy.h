@@ -1,11 +1,11 @@
-#ifndef CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
-#define CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
+#ifndef CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
+#define CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
 
 #include "../common.h"
 
 // 敵の状態は無視して、自分のスコアを最大化するように動く Strategy
 // 中身はビームサーチ
-class BeamSearchStrategy : public IStrategy {
+class PrioritizeSkillStrategy : public IStrategy {
 private:
     struct State {
         Field field;
@@ -19,21 +19,22 @@ private:
         bool operator<(const State& a) const;
     };
 
-    // 連鎖に繋がりそうな位置関係
-    // 盤面の評価に使う
-    const int DX_NEAR[3] = {1, 0, -1};
-    const int DY_NEAR[3] = {2, 2, 2};
+    enum class SearchType {
+        MAXIMIZE_EXPLODE_BLOCK_NUM,
+        INCREASE_SCORE
+    } searchType = SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM;
 
     Game* game;
 
-    Action beamSearch(int depth, unsigned width);
+    Action chokudaiSearch(int depth, double timeLimit);
     int calcFieldScore(Field& field);
+    int countExplodeBlockNum(Field& field);
 
 public:
-    BeamSearchStrategy();
+    PrioritizeSkillStrategy();
 
     string getName() override;
     Action getAction(Game& game) override;
 };
 
-#endif //CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
+#endif //CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
