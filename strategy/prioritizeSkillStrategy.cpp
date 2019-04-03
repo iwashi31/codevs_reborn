@@ -10,7 +10,7 @@ bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::St
 PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
 
 string PrioritizeSkillStrategy::getName() {
-    return "iwashiAI_v2.0";
+    return "iwashiAI_v2.1";
 }
 
 Action PrioritizeSkillStrategy::getAction(Game &game) {
@@ -30,7 +30,7 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
         }
     } else assert(false);
 
-    return chokudaiSearch(5, 0.1);
+    return chokudaiSearch(10, 0.3);
 }
 
 Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
