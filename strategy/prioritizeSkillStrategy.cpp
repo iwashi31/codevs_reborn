@@ -82,7 +82,7 @@ int PrioritizeSkillStrategy::calcFieldScore(Field& field) {
 
 int PrioritizeSkillStrategy::countExplodeBlockNum(Field& field) {
     int cnt = 0;
-    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+    rep(y, FIELD_HEIGHT + PACK_SIZE) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0 || field[y][x] >= ERASE_SUM) continue;
         cnt += [&]() {
             for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {

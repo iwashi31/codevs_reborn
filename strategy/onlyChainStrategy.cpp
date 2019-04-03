@@ -62,7 +62,7 @@ int OnlyChainStrategy::calcFieldScore(Field& field) {
     int score = 0;
 
     // 連鎖に繋がりそうな位置関係の組み合わせがあれば加点
-    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+    rep(y, FIELD_HEIGHT + PACK_SIZE) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0) continue;
         rep(i, 3) {
             int ix = x + DX_NEAR[i];

@@ -47,7 +47,7 @@ extern const long long SKILL_CHAIN_SCORE[]; // スキルチェインスコア
 extern const int EXPLODE_SCORE[];           // 爆発スコア
 
 using Pack = array<array<int, PACK_SIZE>, PACK_SIZE>;
-using RowField = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT + PACK_SIZE>;
+using RowField = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT + PACK_SIZE + 1>;
 
 class Point {
 public:

@@ -476,25 +476,25 @@ bool Field::inField(int x, int y) {
 int Field::dropPack(const Pack &pack, int position, int rotation) {
     assert(position >= 0 && position < FIELD_WIDTH - 1);
     if (rotation == 0) {
-        field[FIELD_HEIGHT][position] = pack[0][0];
-        field[FIELD_HEIGHT + 1][position] = pack[1][0];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[1][1];
-        field[FIELD_HEIGHT][position + 1] = pack[0][1];
-    } else if (rotation == 1) {
-        field[FIELD_HEIGHT][position] = pack[0][1];
         field[FIELD_HEIGHT + 1][position] = pack[0][0];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[1][0];
-        field[FIELD_HEIGHT][position + 1] = pack[1][1];
-    } else if (rotation == 2) {
-        field[FIELD_HEIGHT][position] = pack[1][1];
-        field[FIELD_HEIGHT + 1][position] = pack[0][1];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[0][0];
-        field[FIELD_HEIGHT][position + 1] = pack[1][0];
-    } else if (rotation == 3) {
-        field[FIELD_HEIGHT][position] = pack[1][0];
-        field[FIELD_HEIGHT + 1][position] = pack[1][1];
+        field[FIELD_HEIGHT + 2][position] = pack[1][0];
+        field[FIELD_HEIGHT + 2][position + 1] = pack[1][1];
         field[FIELD_HEIGHT + 1][position + 1] = pack[0][1];
-        field[FIELD_HEIGHT][position + 1] = pack[0][0];
+    } else if (rotation == 1) {
+        field[FIELD_HEIGHT + 1][position] = pack[0][1];
+        field[FIELD_HEIGHT + 2][position] = pack[0][0];
+        field[FIELD_HEIGHT + 2][position + 1] = pack[1][0];
+        field[FIELD_HEIGHT + 1][position + 1] = pack[1][1];
+    } else if (rotation == 2) {
+        field[FIELD_HEIGHT + 1][position] = pack[1][1];
+        field[FIELD_HEIGHT + 2][position] = pack[0][1];
+        field[FIELD_HEIGHT + 2][position + 1] = pack[0][0];
+        field[FIELD_HEIGHT + 1][position + 1] = pack[1][0];
+    } else if (rotation == 3) {
+        field[FIELD_HEIGHT + 1][position] = pack[1][0];
+        field[FIELD_HEIGHT + 2][position] = pack[1][1];
+        field[FIELD_HEIGHT + 2][position + 1] = pack[0][1];
+        field[FIELD_HEIGHT + 1][position + 1] = pack[0][0];
     } else assert(false);
 
     columnUpdated[position] = true;
@@ -534,7 +534,7 @@ void Player::input(istream& is) {
     is >> leftTime;
     is >> obstacleStock;
     is >> skillGage;
-    for (int y = FIELD_HEIGHT + PACK_SIZE - 1; y >= FIELD_HEIGHT; y--) rep(x, FIELD_WIDTH) field[y][x] = 0;
+    for (int y = FIELD_HEIGHT + PACK_SIZE; y >= FIELD_HEIGHT; y--) rep(x, FIELD_WIDTH) field[y][x] = 0;
     for (int y = FIELD_HEIGHT - 1; y >= 0; y--) rep(x, FIELD_WIDTH) is >> field[y][x];
     string end;
     is >> end;
