@@ -2,7 +2,7 @@
 #include "prioritizeSkillStrategy.h"
 
 PrioritizeSkillStrategy::State::State() = default;
-PrioritizeSkillStrategy::State::State(Field& field, int score) : field(field), score(score) {}
+PrioritizeSkillStrategy::State::State(Player& player, int score) : player(player), score(score) {}
 bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::State &a) const {
     return score < a.score;
 }
@@ -10,7 +10,7 @@ bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::St
 PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
 
 string PrioritizeSkillStrategy::getName() {
-    return "iwashiAI_v2.0_beta";
+    return "iwashiAI_v2.0";
 }
 
 Action PrioritizeSkillStrategy::getAction(Game &game) {
@@ -41,7 +41,7 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
 
     Timer timer;
     vector<priority_queue<State>> q(static_cast<unsigned>(depth + 1));
-    q[0].push(State(game->player[0].field, 0));
+    q[0].push(State(game->player[0], 0));
     int width = 0;
     while (timer.getTime() < timeLimit) {
         width++;
@@ -51,8 +51,9 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
 
             rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
                 auto nextState = state;
-                int chain = nextState.field.dropPack(game->packs[turn + i], position, rotation);
-                nextState.score += calcFieldScore(nextState.field);
+                state.player.fallObstacles();
+                int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
+                nextState.score += calcFieldScore(nextState.player.field);
                 if (searchType == SearchType::INCREASE_SCORE && chain > 0) {
                     nextState.score += INCREMENT_SKILL_GAGE;
                     nextState.score -= 5 * (chain - 1);
@@ -71,7 +72,7 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
     cerr << "---" << endl;
     cerr << "type :" << (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM ? 0 : 1) << endl;
     cerr << "width:" << width << endl;
-    cerr << "count:" << countExplodeBlockNum(bestState.field) << endl;
+    cerr << "count:" << countExplodeBlockNum(bestState.player.field) << endl;
 
     return bestAction;
 }
@@ -83,7 +84,7 @@ int PrioritizeSkillStrategy::calcFieldScore(Field& field) {
 int PrioritizeSkillStrategy::countExplodeBlockNum(Field& field) {
     int cnt = 0;
     rep(y, FIELD_HEIGHT + PACK_SIZE) rep(x, FIELD_WIDTH) {
-        if (field[y][x] == 0 || field[y][x] >= ERASE_SUM) continue;
+        if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
         cnt += [&]() {
             for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {
                 int nx = x + dx;

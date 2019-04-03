@@ -8,13 +8,13 @@
 class PrioritizeSkillStrategy : public IStrategy {
 private:
     struct State {
-        Field field;
+        Player player;
         long long score;
         vector<Action> actions;
         vector<int> chains;
 
         State();
-        State(Field& field, int score);
+        State(Player& player, int score);
 
         bool operator<(const State& a) const;
     };

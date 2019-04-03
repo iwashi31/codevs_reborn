@@ -540,6 +540,12 @@ void Player::input(istream& is) {
     is >> end;
 }
 
+void Player::fallObstacles() {
+    if (obstacleStock < FIELD_WIDTH) return;
+    obstacleStock -= FIELD_WIDTH;
+    rep(x, FIELD_WIDTH) field[FIELD_HEIGHT][x] = OBSTACLE;
+}
+
 void Game::inputPackInfo(istream& is) {
     string end;
     for (auto& pack : packs) {

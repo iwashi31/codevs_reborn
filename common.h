@@ -24,6 +24,7 @@ const int FIELD_WIDTH = 10;             // フィールドの幅
 const int MAX_TURN_NUM = 500;           // 最大ターン数
 const int EXPLODE_NUM = 5;              // 爆発するブロックの数字
 const int ERASE_SUM = 10;               // 消滅する和の数
+const int OBSTACLE = 11;                // お邪魔ブロックを示す数字
 const int SKILL_GAGE_THRESHOLD = 80;    // スキル使用可能になるゲージのしきい値
 const int INCREMENT_SKILL_GAGE = 8;     // ブロック消滅時のスキルゲージ増加量
 
@@ -92,6 +93,7 @@ public:
     Field field;
 
     void input(istream& is);
+    void fallObstacles();
 };
 
 class Game {
