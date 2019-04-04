@@ -8,13 +8,13 @@
 class OnlyChainStrategy : public IStrategy {
 private:
     struct State {
-        Field field;
+        Player player;
         long long score;
         vector<Action> actions;
         vector<int> chains;
 
         State();
-        State(Field& field, int score);
+        State(Player& player, int score);
 
         bool operator<(const State& a) const;
     };
@@ -26,8 +26,8 @@ private:
 
     Game* game;
 
-    Action beamSearch(int depth, unsigned width);
-    int calcFieldScore(Field& field);
+    Action chokudaiSearch(int depth, double timeLimit);
+    long long calcFieldScore(Field& field);
 
 public:
     OnlyChainStrategy();

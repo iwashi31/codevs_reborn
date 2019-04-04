@@ -4,7 +4,7 @@
 #include "strategy/prioritizeSkillStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new PrioritizeSkillStrategy();
+    IStrategy* strategy = new OnlyChainStrategy();
 
     cout << strategy->getName() << endl;
     cout.flush();

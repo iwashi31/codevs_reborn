@@ -76,9 +76,13 @@ public:
     // パックを指定の位置に落とす
     // 返り値は連鎖数。ただし、デンジャーゾーンを超えた場合 -1 が返る
     int dropPack(const Pack& pack, int position, int rotation);
+    int drop();
 
     // 点 (x, y) がフィールド内の点か否かを返す
     bool inField(int x, int y);
+
+    // field[y][x] の値を block に上書き
+    void update(int x, int y, int block);
 
     void print(ostream& os);
 

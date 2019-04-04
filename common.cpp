@@ -500,6 +500,10 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
     columnUpdated[position] = true;
     columnUpdated[position + 1] = true;
 
+    return drop();
+}
+
+int Field::drop() {
     int chains = 0;
     while (true) {
         // 自由落下させてデンジャーゾーンに達したらアウト
@@ -515,6 +519,11 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
     }
 
     return chains;
+}
+
+void Field::update(int x, int y, int block) {
+    columnUpdated[x] = true;
+    field[y][x] = block;
 }
 
 void Field::print(ostream& os) {
