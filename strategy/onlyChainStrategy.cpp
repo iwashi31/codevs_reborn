@@ -10,7 +10,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.3";
+    return "iwashiAI_v1.4";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -63,6 +63,10 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
                 q[i + 1].push(nextState);
             }
         }
+    }
+
+    if (q.back().empty()) {
+        return Action::createDropPackAction(-1, -1);
     }
 
     State bestState = q.back().top();

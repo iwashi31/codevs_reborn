@@ -552,7 +552,7 @@ void Player::input(istream& is) {
 void Player::fallObstacles() {
     if (obstacleStock < FIELD_WIDTH) return;
     obstacleStock -= FIELD_WIDTH;
-    rep(x, FIELD_WIDTH) field[FIELD_HEIGHT][x] = OBSTACLE;
+    rep(x, FIELD_WIDTH) field.update(x, FIELD_HEIGHT, OBSTACLE);
 }
 
 void Game::inputPackInfo(istream& is) {
