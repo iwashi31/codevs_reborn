@@ -10,7 +10,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.2";
+    return "iwashiAI_v1.3";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -77,8 +77,8 @@ long long OnlyChainStrategy::calcFieldScore(Field& field) {
     rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
         if (field[y + 1][x] == 0) continue;
-        if ((x > 1 && field[y + 1][x - 1] == 0 && (y < 2 || field[y - 2][x - 1] != 0))
-            || (x < FIELD_WIDTH - 1 && field[y + 1][x + 1] == 0 && (y < 2 || field[y - 2][x + 1] != 0))) {
+        if ((x > 1 && field[y + 1][x - 1] == 0)
+            || (x < FIELD_WIDTH - 1 && field[y + 1][x + 1] == 0)) {
             Field tmpField = field;
             tmpField.update(x, y, 0);
             int chain = tmpField.drop();
