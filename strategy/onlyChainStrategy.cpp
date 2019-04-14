@@ -10,7 +10,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.6";
+    return "iwashiAI_v1.7";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -107,5 +107,8 @@ long long OnlyChainStrategy::calcFieldScore(Field& field) {
         }
     }
 
-    return CHAIN_SCORE[maxChain] - max(0, maxHeight - 10);
+    long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10);
+    score = 100 * score + randXor() % 100;
+
+    return score;
 }
