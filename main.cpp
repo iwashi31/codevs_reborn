@@ -4,7 +4,14 @@
 #include "strategy/prioritizeSkillStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new OnlyChainStrategy();
+    mt19937 rng(time(NULL));
+
+    IStrategy* strategy;
+    if (rng() % 2) {
+        strategy = new OnlyChainStrategy();
+    } else {
+        strategy = new PrioritizeSkillStrategy();
+    }
 
     Field::initHashSeed();
 
