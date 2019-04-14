@@ -10,7 +10,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.5";
+    return "iwashiAI_v1.6";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {

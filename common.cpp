@@ -423,8 +423,7 @@ Field::Field() {
     memset(columnUpdated, false, sizeof(columnUpdated));
 }
 
-bool Field::freeFall() {
-    bool valid = true;
+void Field::freeFall() {
     rep(x, FIELD_WIDTH) {
         if (!columnUpdated[x]) continue;
         columnUpdated[x] = false;
@@ -436,14 +435,10 @@ bool Field::freeFall() {
                 bottom++;
             }
         }
-        if (field[FIELD_HEIGHT][x] != 0) {
-            valid = false;
-        }
     }
-    return valid;
 }
 
-bool Field::eraseBlocks() {
+int Field::eraseBlocks() {
     // TODO: 高速化の余地がありそう
     vector<Point> erasedPoints;
     rep(y, field.size()) rep(x, FIELD_WIDTH) {
@@ -466,7 +461,15 @@ bool Field::eraseBlocks() {
         columnUpdated[p.x] = true;
     }
 
-    return !erasedPoints.empty();
+    // TODO: 重複カウントの修正
+    return erasedPoints.size();
+}
+
+bool Field::isAlive() {
+    rep(x, FIELD_WIDTH) {
+        if (field[FIELD_HEIGHT][x] != 0) return false;
+    }
+    return true;
 }
 
 bool Field::inField(int x, int y) {
@@ -506,13 +509,10 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
 int Field::drop() {
     int chains = 0;
     while (true) {
-        // 自由落下させてデンジャーゾーンに達したらアウト
-        if (!freeFall()) {
-            chains = -1;
-            break;
-        }
-        // ブロックの消滅が発生しなければ終了
-        if (!eraseBlocks()) {
+        freeFall();
+        int eraseNum = eraseBlocks();
+        if (eraseNum == 0) {
+            if (!isAlive()) chains = -1;
             break;
         }
         chains++;

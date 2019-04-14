@@ -63,12 +63,15 @@ private:
     RowField field{};
     bool columnUpdated[FIELD_WIDTH]{};  // 自由落下時、このフラグが立っている列のみ計算する
 
-    // ブロックを自由落下させ、デンジャーラインを超えなければ true, 超えれば false を返す
-    bool freeFall();
+    // ブロックを自由落下させる
+    void freeFall();
 
     // 消えるブロックを消す
-    // ブロックの消滅が発生すれば true, 発生しなければ false を返す
-    bool eraseBlocks();
+    // 消えたブロックの数を返す
+    int eraseBlocks();
+
+    // ブロックがデンジャーゾーンに達していないかを調べる
+    bool isAlive();
 
 public:
     Field();
