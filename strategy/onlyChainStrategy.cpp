@@ -1,5 +1,6 @@
 #include "../common.h"
 #include "onlyChainStrategy.h"
+#include "randomStrategy.h"
 
 OnlyChainStrategy::State::State() = default;
 OnlyChainStrategy::State::State(Player& player, int score) : player(player), score(score) {}
@@ -10,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.7";
+    return "iwashiAI_v1.8";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -80,7 +81,7 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
     }
 
     if (q.back().empty()) {
-        return Action::createDropPackAction(-1, -1);
+        return RandomStrategy().getAction(*game);
     }
 
     State bestState = q.back().top();
