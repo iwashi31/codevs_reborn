@@ -10,7 +10,7 @@ Action RandomStrategy::getAction(Game &game) {
     if (me.skillGage >= SKILL_GAGE_THRESHOLD) {
         return Action::createExplodeAction();
     }
-    int position = static_cast<int>(randXor() % (FIELD_WIDTH - 1));
-    int rotation = static_cast<int>(randXor() % 4);
+    int position = static_cast<int>(rng.rand() % (FIELD_WIDTH - 1));
+    int rotation = static_cast<int>(rng.rand() % 4);
     return Action::createDropPackAction(position, rotation);
 }

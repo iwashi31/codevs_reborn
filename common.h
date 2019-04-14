@@ -10,6 +10,7 @@
 #include <queue>
 #include <algorithm>
 #include <cassert>
+#include <unordered_set>
 
 using namespace std;
 
@@ -60,6 +61,8 @@ public:
 
 class Field {
 private:
+    static long long hashSeed[FIELD_HEIGHT + PACK_SIZE + 1][FIELD_WIDTH][OBSTACLE + 1];
+
     RowField field{};
     bool columnUpdated[FIELD_WIDTH]{};  // 自由落下時、このフラグが立っている列のみ計算する
 
@@ -86,6 +89,9 @@ public:
 
     // field[y][x] の値を block に上書き
     void update(int x, int y, int block);
+
+    static void initHashSeed();
+    unsigned long long getHash();
 
     void print(ostream& os);
 
@@ -143,10 +149,15 @@ public:
     double getTime();
 };
 
+class RandomNumberGenerator {
+public:
+    unsigned long long rand();
+};
+
 // AI の思考はこのクラスを継承し、getAction(Game&) として記述する
 class IStrategy {
 protected:
-    unsigned long randXor();
+    RandomNumberGenerator rng;
 
 public:
     virtual string getName() = 0;

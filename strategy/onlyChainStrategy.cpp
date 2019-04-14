@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.9";
+    return "iwashiAI_v1.10";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -59,6 +59,7 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
 
     Timer timer;
     vector<priority_queue<State>> q(static_cast<unsigned int>(depth + 1));
+    vector<unordered_set<unsigned long long>> pushedHash(depth + 1);
     q[0].push(State(game->player[0], 0));
     int width = 0;
     while (timer.getTime() < timeLimit) {
@@ -72,6 +73,11 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
                 state.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
                 if (chain == -1) continue;
+
+                unsigned long long hash = nextState.player.field.getHash();
+                if (pushedHash[i + 1].find(hash) != pushedHash[i + 1].end()) continue;
+                pushedHash[i + 1].insert(hash);
+
                 nextState.score += calcFieldScore(nextState.player.field);
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
@@ -109,7 +115,7 @@ long long OnlyChainStrategy::calcFieldScore(Field& field) {
     }
 
     long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10);
-    score = 100 * score + randXor() % 100;
+    score = 100 * score + rng.rand() % 100;
 
     return score;
 }

@@ -6,6 +6,8 @@
 int main(int argc, char* argv[]) {
     IStrategy* strategy = new OnlyChainStrategy();
 
+    Field::initHashSeed();
+
     cout << strategy->getName() << endl;
     cout.flush();
 

@@ -423,6 +423,8 @@ Field::Field() {
     memset(columnUpdated, false, sizeof(columnUpdated));
 }
 
+long long Field::hashSeed[FIELD_HEIGHT + PACK_SIZE + 1][FIELD_WIDTH][OBSTACLE + 1];
+
 void Field::freeFall() {
     rep(x, FIELD_WIDTH) {
         if (!columnUpdated[x]) continue;
@@ -526,6 +528,21 @@ void Field::update(int x, int y, int block) {
     field[y][x] = block;
 }
 
+void Field::initHashSeed() {
+    RandomNumberGenerator rng;
+    rep(y, FIELD_HEIGHT + PACK_SIZE + 1) rep(x, FIELD_WIDTH) rep(i, OBSTACLE + 1) {
+        hashSeed[y][x][i] = rng.rand();
+    }
+}
+
+unsigned long long Field::getHash() {
+    unsigned long long hash = 0;
+    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+        hash ^= hashSeed[y][x][field[y][x]];
+    }
+    return hash;
+}
+
 void Field::print(ostream& os) {
     for (int y = field.size() - 1; y >= 0; y--) {
         rep(x, FIELD_WIDTH) {
@@ -591,9 +608,9 @@ double Timer::getTime() {
     return (double)(getCycle() - beginCycle) / 2500000000;
 }
 
-unsigned long IStrategy::randXor() {
-    static unsigned long x = 123456789, y = 362436069, z = 521288629, w = 88675123;
-    unsigned long t = (x ^ (x << 11));
+unsigned long long RandomNumberGenerator::rand() {
+    static unsigned long long x = 123456789, y = 362436069, z = 521288629, w = 88675123;
+    unsigned long long t = (x ^ (x << 11));
     x = y;
     y = z;
     z = w;
