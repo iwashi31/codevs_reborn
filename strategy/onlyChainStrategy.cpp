@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.10";
+    return "iwashiAI_v1.11";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -44,7 +44,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
     cerr << "turn:" << game.turn << endl;
     cerr << "bestChain:" << bestChain1 << ", " << bestChain2 << endl;
     cerr << "action:(" << bestAction.position << ", " << bestAction.rotation << "), (" << bestAction2.position << ", " << bestAction2.rotation << ")" << endl;
-    if (bestChain >= 15) {
+    if (bestChain >= 10) {
         return bestAction;
     }
 
