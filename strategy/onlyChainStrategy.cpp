@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.8";
+    return "iwashiAI_v1.9";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -48,7 +48,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
         return bestAction;
     }
 
-    return chokudaiSearch(10, 0.3);
+    return chokudaiSearch(5, 0.3);
 }
 
 Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
