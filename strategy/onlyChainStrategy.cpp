@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.12";
+    return "iwashiAI_v1.13";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -20,30 +20,48 @@ Action OnlyChainStrategy::getAction(Game &game) {
     game.player[0].fallObstacles();
 
     int bestChain = 0;
-    int bestChain1 = 0, bestChain2 = 0;
-    Action bestAction{}, bestAction2{};
+    int bestChain1 = 0, bestChain2 = 0, bestChain3 = 0;
+    unordered_set<unsigned long long> visitedHash[2];
+    Action bestAction{};
+    Player tmpPlayer = game.player[0];
+    tmpPlayer.fallObstacles();
     rep(pos1, FIELD_WIDTH - 1) rep(rot1, 4) {
-        Player player = game.player[0];
-        player.fallObstacles();
+        Player player = tmpPlayer;
         int chain1 = player.field.dropPack(game.packs[game.turn], pos1, rot1);
         if (chain1 == -1) continue;
+        auto hash = player.field.getHash();
+        if (visitedHash[0].find(hash) != visitedHash[0].end()) continue;
+        visitedHash[0].insert(hash);
+        player.fallObstacles();
         rep(pos2, FIELD_WIDTH - 1) rep(rot2, 4) {
             Player player2 = player;
-            player2.fallObstacles();
             int chain2 = player2.field.dropPack(game.packs[game.turn + 1], pos2, rot2);
             if (chain2 == -1) continue;
-            if (max(chain1, chain2 - 1) > bestChain) {
-                bestChain = max(chain1, chain2 - 1);
-                bestChain1 = chain1;
-                bestChain2 = chain2;
-                bestAction = Action::createDropPackAction(pos1, rot1);
-                bestAction2 = Action::createDropPackAction(pos2, rot2);
+            auto hash = player2.field.getHash();
+            if (visitedHash[1].find(hash) != visitedHash[1].end()) continue;
+            visitedHash[1].insert(hash);
+            player2.fallObstacles();
+            rep(pos3, FIELD_WIDTH - 1) rep(rot3, 4) {
+                Player player3 = player2;
+                int chain3 = player3.field.dropPack(game.packs[game.turn + 2], pos3, rot3);
+                if (chain3 == -1) continue;
+                int maxChain = max({chain1, chain2, chain3}) * 10;
+                if (maxChain == chain1 * 10) maxChain += 9;
+                else if (maxChain == chain2 * 10) maxChain += 8;
+                else if (maxChain == chain3 * 10) maxChain += 7;
+                if (maxChain > bestChain) {
+                    bestChain = maxChain;
+                    bestChain1 = chain1;
+                    bestChain2 = chain2;
+                    bestChain3 = chain3;
+                    bestAction = Action::createDropPackAction(pos1, rot1);
+                }
             }
         }
     }
+    bestChain /= 10;
     cerr << "turn:" << game.turn << endl;
-    cerr << "bestChain:" << bestChain1 << ", " << bestChain2 << endl;
-    cerr << "action:(" << bestAction.position << ", " << bestAction.rotation << "), (" << bestAction2.position << ", " << bestAction2.rotation << ")" << endl;
+    cerr << "bestChain:" << bestChain1 << ", " << bestChain2 << ", " << bestChain3 << endl;
     if (bestChain >= 12) {
         return bestAction;
     }
