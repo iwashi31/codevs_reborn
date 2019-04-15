@@ -105,6 +105,7 @@ public:
     int leftTime{};
     int obstacleStock{};
     int skillGage{};
+    long long score{};
     Field field;
 
     void input(istream& is);
