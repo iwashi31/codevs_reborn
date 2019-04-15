@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.14";
+    return "iwashiAI_v1.15";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -19,10 +19,24 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     game.player[0].fallObstacles();
 
+    if (game.turn == 0) {
+        return firstSearch(15, 18);
+    }
+
+    if (!actionQueue.empty()) {
+        if (game.player[0].obstacleStock < 10) {
+            Action action = actionQueue.front();
+            actionQueue.pop();
+            return action;
+        } else {
+            while (!actionQueue.empty()) actionQueue.pop();
+        }
+    }
+
     int bestChain = 0;
     int bestChain1 = 0, bestChain2 = 0, bestChain3 = 0;
     unordered_set<unsigned long long> visitedHash[2];
-    Action bestAction{};
+    Action bestAction{}, bestAction2{}, bestAction3{};
     Player tmpPlayer = game.player[0];
     tmpPlayer.fallObstacles();
     rep(pos1, FIELD_WIDTH - 1) rep(rot1, 4) {
@@ -37,9 +51,9 @@ Action OnlyChainStrategy::getAction(Game &game) {
             Player player2 = player;
             int chain2 = player2.field.dropPack(game.packs[game.turn + 1], pos2, rot2);
             if (chain2 == -1) continue;
-            auto hash = player2.field.getHash();
-            if (visitedHash[1].find(hash) != visitedHash[1].end()) continue;
-            visitedHash[1].insert(hash);
+            auto hash2 = player2.field.getHash();
+            if (visitedHash[1].find(hash2) != visitedHash[1].end()) continue;
+            visitedHash[1].insert(hash2);
             player2.fallObstacles();
             rep(pos3, FIELD_WIDTH - 1) rep(rot3, 4) {
                 Player player3 = player2;
@@ -55,6 +69,8 @@ Action OnlyChainStrategy::getAction(Game &game) {
                     bestChain2 = chain2;
                     bestChain3 = chain3;
                     bestAction = Action::createDropPackAction(pos1, rot1);
+                    bestAction2 = Action::createDropPackAction(pos2, rot2);
+                    bestAction3 = Action::createDropPackAction(pos3, rot3);
                 }
             }
         }
@@ -62,6 +78,10 @@ Action OnlyChainStrategy::getAction(Game &game) {
     bestChain /= 10;
     cerr << "turn:" << game.turn << endl;
     cerr << "bestChain:" << bestChain1 << ", " << bestChain2 << ", " << bestChain3 << endl;
+    if (bestChain >= 14) {
+        actionQueue.push(bestAction2);
+        actionQueue.push(bestAction3);
+    }
     if (bestChain >= 12) {
         return bestAction;
     }
@@ -77,7 +97,7 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
 
     Timer timer;
     vector<priority_queue<State>> q(static_cast<unsigned int>(depth + 1));
-    vector<unordered_set<unsigned long long>> pushedHash(depth + 1);
+    vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
     q[0].push(State(game->player[0], 0));
     int width = 0;
     while (timer.getTime() < timeLimit) {
@@ -110,6 +130,72 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
 
     State bestState = q.back().top();
     Action& bestAction = bestState.actions[0];
+
+    return bestAction;
+}
+
+Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
+    Timer timer;
+    vector<priority_queue<State>> q(static_cast<unsigned int>(depth + 1));
+    vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
+    q[0].push(State(game->player[0], 0));
+    int width = 0;
+    vector<State> statePool;
+    while (timer.getTime() < timeLimit) {
+        width++;
+        rep(i, depth) {
+            if (q[i].empty()) continue;
+            State state = q[i].top(); q[i].pop();
+
+            rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+                auto nextState = state;
+                nextState.player.fallObstacles();
+                int chain = nextState.player.field.dropPack(game->packs[game->turn + i], position, rotation);
+                if (chain == -1) continue;
+                if (chain >= 2 && chain < 12) continue;
+
+                nextState.score += calcFieldScore(nextState.player.field);
+                nextState.actions.push_back(Action::createDropPackAction(position, rotation));
+                nextState.chains.push_back(chain);
+
+                if (chain >= 12) {
+                    statePool.push_back(nextState);
+                    continue;
+                }
+
+                if (i == depth - 1) continue;
+
+                unsigned long long hash = nextState.player.field.getHash();
+                if (pushedHash[i + 1].find(hash) != pushedHash[i + 1].end()) continue;
+                pushedHash[i + 1].insert(hash);
+
+                q[i + 1].push(nextState);
+            }
+        }
+        if (width == 3500) break;
+    }
+
+    if (statePool.empty()) {
+        return RandomStrategy().getAction(*game);
+    }
+
+    sort(all(statePool), [](State &s1, State &s2) {
+        int val1 = s1.chains.back() - s1.actions.size();
+        int val2 = s2.chains.back() - s2.actions.size();
+        if (val1 == val2) {
+            return s1.actions.size() < s2.actions.size();
+        }
+        return val1 > val2;
+    });
+
+    State bestState = statePool[0];
+    Action& bestAction = bestState.actions[0];
+
+    cerr << "turn:" << bestState.actions.size();
+    cerr << "chain:" << bestState.chains.back() << endl;
+
+    for (auto &action : bestState.actions) actionQueue.push(action);
+    actionQueue.pop();
 
     return bestAction;
 }

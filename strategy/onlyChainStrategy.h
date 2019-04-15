@@ -25,8 +25,10 @@ private:
     const int DY_NEAR[3] = {2, 2, 2};
 
     Game* game;
+    queue<Action> actionQueue;
 
     Action chokudaiSearch(int depth, double timeLimit);
+    Action firstSearch(int depth, double timeLimit);
     long long calcFieldScore(Field& field);
 
 public:
