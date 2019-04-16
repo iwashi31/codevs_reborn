@@ -92,6 +92,9 @@ public:
     // field[y][x] の値を block に上書き
     void update(int x, int y, int block);
 
+    // 1~9 のブロック数を返す
+    int countNumberBlock();
+
     static void initHashSeed();
     unsigned long long getHash();
 

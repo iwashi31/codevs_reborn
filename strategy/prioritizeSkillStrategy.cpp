@@ -10,7 +10,7 @@ bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::St
 PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
 
 string PrioritizeSkillStrategy::getName() {
-    return "iwashiAI_v2.2";
+    return "iwashiAI_v2.3";
 }
 
 Action PrioritizeSkillStrategy::getAction(Game &game) {
@@ -32,6 +32,10 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
             }
         }
     } else assert(false);
+
+    cerr << "---" << endl;
+    cerr << "type :" << (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM ? 0 : 1) << endl;
+    cerr << "turn:" << game.turn << " gage:" << game.player[0].skillGage << " num:" << explodeBlockNum << endl;
 
     return chokudaiSearch(10, 0.3);
 }
@@ -56,11 +60,12 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
                 auto nextState = state;
                 state.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
-                nextState.score += calcFieldScore(nextState.player.field);
+                nextState.score += 100 * calcFieldScore(nextState.player.field);
                 if (searchType == SearchType::INCREASE_GAGE && chain > 0) {
-                    nextState.score += INCREMENT_SKILL_GAGE;
-                    nextState.score -= 5 * (chain - 1);
+                    nextState.score += 100 * INCREMENT_SKILL_GAGE;
+                    nextState.score -= 500 * (chain - 1);
                 }
+                nextState.score += nextState.player.field.countNumberBlock();
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
                 q[i + 1].push(nextState);
@@ -71,11 +76,6 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
     //const State& bestState = q.back().top();
     State bestState = q.back().top();
     const Action& bestAction = bestState.actions[0];
-
-    cerr << "---" << endl;
-    cerr << "type :" << (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM ? 0 : 1) << endl;
-    cerr << "width:" << width << endl;
-    cerr << "count:" << countExplodeBlockNum(bestState.player.field) << endl;
 
     return bestAction;
 }

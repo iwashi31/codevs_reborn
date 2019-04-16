@@ -528,6 +528,14 @@ void Field::update(int x, int y, int block) {
     field[y][x] = block;
 }
 
+int Field::countNumberBlock() {
+    int cnt = 0;
+    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+        if (field[y][x] >= 1 && field[y][x] <= 9) cnt++;
+    }
+    return cnt;
+}
+
 void Field::initHashSeed() {
     RandomNumberGenerator rng;
     rep(y, FIELD_HEIGHT + PACK_SIZE + 1) rep(x, FIELD_WIDTH) rep(i, OBSTACLE + 1) {
