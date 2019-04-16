@@ -1,5 +1,6 @@
 #include "../common.h"
 #include "prioritizeSkillStrategy.h"
+#include "randomStrategy.h"
 
 PrioritizeSkillStrategy::State::State() = default;
 PrioritizeSkillStrategy::State::State(Player& player, int score) : player(player), score(score) {}
@@ -10,11 +11,25 @@ bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::St
 PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
 
 string PrioritizeSkillStrategy::getName() {
-    return "iwashiAI_v2.4-SNAPSHOT";
+    return "iwashiAI_v2.4";
 }
 
 Action PrioritizeSkillStrategy::getAction(Game &game) {
     this->game = &game;
+
+    if (game.turn == 0) {
+        bulkSearch(14, 18);
+    }
+
+    if (!actionQueue.empty()) {
+        if (game.player[0].obstacleStock < 10) {
+            auto action = actionQueue.front();
+            actionQueue.pop();
+            return action;
+        } else {
+            while (!actionQueue.empty()) actionQueue.pop();
+        }
+    }
 
     int explodeBlockNum = countExplodeBlockNum(game.player[0].field);
     if (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM) {
@@ -60,12 +75,18 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
                 auto nextState = state;
                 state.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
-                nextState.score += calcFieldScore(nextState.player.field, chain);
+                if (chain == -1) continue;
+                nextState.score = calcFieldScore(nextState.player, chain);
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
+                if (chain > 0) nextState.player.increaseSkillGage();
                 q[i + 1].push(nextState);
             }
         }
+    }
+
+    if (q.back().empty()) {
+        return RandomStrategy().getAction(*game);
     }
 
     State bestState = q.back().top();
@@ -74,14 +95,54 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-int PrioritizeSkillStrategy::calcFieldScore(Field& field, int chain) {
-    int score = 0;
-    score = countExplodeBlockNum(field);
-    if (searchType == SearchType::INCREASE_GAGE && chain > 0) {
-        score += INCREMENT_SKILL_GAGE;
-        score -= 5 * (chain - 1);
+void PrioritizeSkillStrategy::bulkSearch(int depth, double timeLimit) {
+    int turn = game->turn;
+    if (turn + depth > MAX_TURN_NUM) {
+        depth = MAX_TURN_NUM - turn;
     }
-    score *= 100;
+
+    Timer timer;
+    vector<priority_queue<State>> q(static_cast<unsigned>(depth + 1));
+    q[0].push(State(game->player[0], 0));
+    int width = 0;
+    while (timer.getTime() < timeLimit) {
+        width++;
+        rep(i, depth) {
+            if (q[i].empty()) continue;
+            State state = q[i].top(); q[i].pop();
+
+            rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+                auto nextState = state;
+                state.player.fallObstacles();
+                int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
+                if (chain == -1) continue;
+                if (chain > 0) nextState.player.increaseSkillGage();
+                nextState.score = calcFieldScore(nextState.player, chain);
+                nextState.actions.push_back(Action::createDropPackAction(position, rotation));
+                nextState.chains.push_back(chain);
+                q[i + 1].push(nextState);
+            }
+        }
+        if (q[depth].size() >= 50000) break;
+    }
+
+    if (q.back().empty()) {
+        return;
+    }
+
+    State bestState = q.back().top();
+    for (auto &action : bestState.actions) actionQueue.push(action);
+
+    cerr << "gage:" << bestState.player.skillGage << " num:" << countExplodeBlockNum(bestState.player.field) << endl;
+}
+
+int PrioritizeSkillStrategy::calcFieldScore(Player& player, int chain) {
+    Field& field = player.field;
+    int score = 0;
+    score = 100 * (countExplodeBlockNum(field) + min(player.skillGage, 80));
+    if (chain > 1) {
+        score -= 100000000;
+    }
     score += field.countNumberBlock();
     return score;
 }

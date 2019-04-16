@@ -25,9 +25,11 @@ private:
     } searchType = SearchType::INCREASE_GAGE;
 
     Game* game;
+    queue<Action> actionQueue;
 
     Action chokudaiSearch(int depth, double timeLimit);
-    int calcFieldScore(Field& field, int chain);
+    void bulkSearch(int depth, double timeLimit);
+    int calcFieldScore(Player& player, int chain);
     int countExplodeBlockNum(Field& field);
 
 public:

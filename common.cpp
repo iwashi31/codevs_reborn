@@ -536,6 +536,13 @@ int Field::countNumberBlock() {
     return cnt;
 }
 
+int Field::getMaxBlockHeight() {
+    for (int y = FIELD_HEIGHT + PACK_SIZE; y >= 0; y--) rep(x, FIELD_WIDTH) {
+        if (field[y][x] != 0) return y;
+    }
+    return -1;
+}
+
 void Field::initHashSeed() {
     RandomNumberGenerator rng;
     rep(y, FIELD_HEIGHT + PACK_SIZE + 1) rep(x, FIELD_WIDTH) rep(i, OBSTACLE + 1) {
@@ -579,6 +586,11 @@ void Player::fallObstacles() {
     if (obstacleStock < FIELD_WIDTH) return;
     obstacleStock -= FIELD_WIDTH;
     rep(x, FIELD_WIDTH) field.update(x, FIELD_HEIGHT, OBSTACLE);
+}
+
+void Player::increaseSkillGage() {
+    skillGage += INCREMENT_SKILL_GAGE;
+    skillGage = min(skillGage, 100);
 }
 
 void Game::inputPackInfo(istream& is) {

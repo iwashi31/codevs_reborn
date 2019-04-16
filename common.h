@@ -95,6 +95,9 @@ public:
     // 1~9 のブロック数を返す
     int countNumberBlock();
 
+    // 一番高いところにあるブロックの y 座標を返す
+    int getMaxBlockHeight();
+
     static void initHashSeed();
     unsigned long long getHash();
 
@@ -113,6 +116,7 @@ public:
 
     void input(istream& is);
     void fallObstacles();
+    void increaseSkillGage();
 };
 
 class Game {
