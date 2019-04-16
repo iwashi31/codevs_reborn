@@ -27,7 +27,7 @@ private:
     Game* game;
 
     Action chokudaiSearch(int depth, double timeLimit);
-    int calcFieldScore(Field& field);
+    int calcFieldScore(Field& field, int chain);
     int countExplodeBlockNum(Field& field);
 
 public:
