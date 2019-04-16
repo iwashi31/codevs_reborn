@@ -21,8 +21,8 @@ private:
 
     enum class SearchType {
         MAXIMIZE_EXPLODE_BLOCK_NUM,
-        INCREASE_SCORE
-    } searchType = SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM;
+        INCREASE_GAGE
+    } searchType = SearchType::INCREASE_GAGE;
 
     Game* game;
 

@@ -10,7 +10,7 @@ bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::St
 PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
 
 string PrioritizeSkillStrategy::getName() {
-    return "iwashiAI_v2.1";
+    return "iwashiAI_v2.2";
 }
 
 Action PrioritizeSkillStrategy::getAction(Game &game) {
@@ -18,15 +18,18 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
 
     int explodeBlockNum = countExplodeBlockNum(game.player[0].field);
     if (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM) {
-        if (explodeBlockNum >= 30) {
-            searchType = SearchType::INCREASE_SCORE;
-        }
-    } else if (searchType == SearchType::INCREASE_SCORE){
-        if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD) {
+        if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD && explodeBlockNum >= 30) {
             return Action::createExplodeAction();
+        } else if (game.player[0].skillGage < SKILL_GAGE_THRESHOLD) {
+            searchType = SearchType ::INCREASE_GAGE;
         }
-        if (explodeBlockNum <= 25) {
-            searchType = SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM;
+    } else if (searchType == SearchType::INCREASE_GAGE){
+        if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD) {
+            if (explodeBlockNum >= 30) {
+                return Action::createExplodeAction();
+            } else {
+                searchType = SearchType ::MAXIMIZE_EXPLODE_BLOCK_NUM;
+            }
         }
     } else assert(false);
 
@@ -54,7 +57,7 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
                 state.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
                 nextState.score += calcFieldScore(nextState.player.field);
-                if (searchType == SearchType::INCREASE_SCORE && chain > 0) {
+                if (searchType == SearchType::INCREASE_GAGE && chain > 0) {
                     nextState.score += INCREMENT_SKILL_GAGE;
                     nextState.score -= 5 * (chain - 1);
                 }

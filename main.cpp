@@ -4,7 +4,7 @@
 #include "strategy/prioritizeSkillStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new OnlyChainStrategy();
+    IStrategy* strategy = new PrioritizeSkillStrategy();
 
     Field::initHashSeed();
 
