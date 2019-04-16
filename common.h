@@ -17,6 +17,7 @@
 using namespace std;
 
 #define rep(i, n) for (int i = 0; i < (n); i++)
+#define REP(i, n, m) for (int i = (n); i < (m); i++)
 #define itrep(i, a) for (auto i = (a).begin(); i != (a).end(); i++)
 #define all(a) (a).begin(), (a).end()
 #define mp(a, b) make_pair((a), (b))

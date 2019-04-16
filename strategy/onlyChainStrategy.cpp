@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.15";
+    return "iwashiAI_v1.16";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -106,7 +106,7 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
             if (q[i].empty()) continue;
             State state = q[i].top(); q[i].pop();
 
-            rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+            REP(position, 2, 7) rep(rotation, 4) {
                 auto nextState = state;
                 state.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
@@ -117,6 +117,7 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
                 pushedHash[i + 1].insert(hash);
 
                 nextState.score += calcFieldScore(nextState.player.field);
+                if (position < 2 || position > 7) nextState.score -= 1000;
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
                 q[i + 1].push(nextState);
@@ -147,7 +148,7 @@ Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
             if (q[i].empty()) continue;
             State state = q[i].top(); q[i].pop();
 
-            rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+            REP(position, 2, 7) rep(rotation, 4) {
                 auto nextState = state;
                 nextState.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[game->turn + i], position, rotation);
