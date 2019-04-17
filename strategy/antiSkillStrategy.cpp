@@ -10,11 +10,15 @@ bool AntiSkillStrategy::State::operator<(const AntiSkillStrategy::State &a) cons
 AntiSkillStrategy::AntiSkillStrategy() : game(nullptr) {}
 
 string AntiSkillStrategy::getName() {
-    return "iwashiAI_v3.0";
+    return "iwashiAI_v3.1";
 }
 
 Action AntiSkillStrategy::getAction(Game &game) {
     this->game = &game;
+
+    if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD) {
+        return Action::createExplodeAction();
+    }
 
     game.player[0].fallObstacles();
 
