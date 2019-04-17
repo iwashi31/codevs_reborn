@@ -1,1 +1,1 @@
-zip submit *.cpp *.h *.sh -r strategy
+zip submit *.cpp *.h run.sh -r strategy
