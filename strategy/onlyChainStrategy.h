@@ -36,6 +36,8 @@ public:
 
     string getName() override;
     Action getAction(Game& game) override;
+
+    void clearQueue();
 };
 
 #endif //CODEVS_REBORN_BEAMSEARCHSTRATEGY_H

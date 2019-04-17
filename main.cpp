@@ -3,9 +3,10 @@
 #include "strategy/onlyChainStrategy.h"
 #include "strategy/prioritizeSkillStrategy.h"
 #include "strategy/antiSkillStrategy.h"
+#include "strategy/switchableStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new AntiSkillStrategy();
+    IStrategy* strategy = new SwitchableStrategy();
 
     Field::initHashSeed();
 

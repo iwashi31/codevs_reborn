@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.17";
+    return "iwashiAI_v1.18-SNAPSHOT";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -29,7 +29,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
             actionQueue.pop();
             return action;
         } else {
-            while (!actionQueue.empty()) actionQueue.pop();
+            clearQueue();
         }
     }
 
@@ -87,6 +87,10 @@ Action OnlyChainStrategy::getAction(Game &game) {
     }
 
     return chokudaiSearch(5, 0.3);
+}
+
+void OnlyChainStrategy::clearQueue() {
+    while (!actionQueue.empty()) actionQueue.pop();
 }
 
 Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
