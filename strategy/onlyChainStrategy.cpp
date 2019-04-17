@@ -8,10 +8,10 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
     return score < a.score;
 }
 
-OnlyChainStrategy::OnlyChainStrategy() : game(nullptr) {}
+OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.18-SNAPSHOT";
+    return "iwashiAI_v1.18";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -19,14 +19,17 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     game.player[0].fallObstacles();
 
-    if (game.turn == 0) {
-        return firstSearch(15, 18);
+    if (game.player[0].obstacleStock < 10 && bulkSearchFlag) {
+        bulkSearchFlag = false;
+        if (game.turn == 0) return firstSearch(15, 18);
+        return firstSearch(15, 5);
     }
 
     if (!actionQueue.empty()) {
         if (game.player[0].obstacleStock < 10) {
             Action action = actionQueue.front();
             actionQueue.pop();
+            if (actionQueue.empty()) bulkSearchFlag = true;
             return action;
         } else {
             clearQueue();
@@ -83,10 +86,11 @@ Action OnlyChainStrategy::getAction(Game &game) {
         actionQueue.push(bestAction3);
     }
     if (bestChain >= 12) {
+        if (bestChain == bestChain1) bulkSearchFlag = true;
         return bestAction;
     }
 
-    return chokudaiSearch(5, 0.3);
+    return chokudaiSearch(5, 0.6);
 }
 
 void OnlyChainStrategy::clearQueue() {
@@ -196,9 +200,10 @@ Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
     State bestState = statePool[0];
     Action& bestAction = bestState.actions[0];
 
-    cerr << "turn:" << bestState.actions.size();
+    cerr << "turn:" << game->turn + bestState.actions.size();
     cerr << "chain:" << bestState.chains.back() << endl;
 
+    clearQueue();
     for (auto &action : bestState.actions) actionQueue.push(action);
     actionQueue.pop();
 

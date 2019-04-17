@@ -25,6 +25,8 @@ private:
     const int DY_NEAR[3] = {2, 2, 2};
 
     Game* game;
+
+    bool bulkSearchFlag;
     queue<Action> actionQueue;
 
     Action chokudaiSearch(int depth, double timeLimit);
