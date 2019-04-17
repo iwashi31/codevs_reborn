@@ -11,13 +11,11 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.18";
+    return "iwashiAI_v1.19";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
     this->game = &game;
-
-    game.player[0].fallObstacles();
 
     if (game.player[0].obstacleStock < 10 && bulkSearchFlag) {
         bulkSearchFlag = false;

@@ -6,3 +6,5 @@ cmake-build-debug/
 *.exe
 
 *.zip
+
+*.out
