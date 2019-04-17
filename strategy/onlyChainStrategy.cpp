@@ -11,7 +11,7 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
 OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.19";
+    return "iwashiAI_v1.20";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -83,7 +83,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
         actionQueue.push(bestAction2);
         actionQueue.push(bestAction3);
     }
-    if (bestChain >= 12) {
+    if (bestChain >= (game.player[0].field.countBlock() <= 100 ? 12 : 9)) {
         if (bestChain == bestChain1) bulkSearchFlag = true;
         return bestAction;
     }

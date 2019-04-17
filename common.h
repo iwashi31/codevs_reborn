@@ -95,6 +95,7 @@ public:
 
     // 1~9 のブロック数を返す
     int countNumberBlock();
+    int countBlock();
 
     // 一番高いところにあるブロックの y 座標を返す
     int getMaxBlockHeight();

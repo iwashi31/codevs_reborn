@@ -536,6 +536,14 @@ int Field::countNumberBlock() {
     return cnt;
 }
 
+int Field::countBlock() {
+    int cnt = 0;
+    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+        if (field[y][x] != 0) cnt++;
+    }
+    return cnt;
+}
+
 int Field::getMaxBlockHeight() {
     for (int y = FIELD_HEIGHT + PACK_SIZE; y >= 0; y--) rep(x, FIELD_WIDTH) {
         if (field[y][x] != 0) return y;
