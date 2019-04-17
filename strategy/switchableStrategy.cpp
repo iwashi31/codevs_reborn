@@ -7,7 +7,7 @@
 SwitchableStrategy::SwitchableStrategy() : game(nullptr) {}
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.1";
+    return "iwashiAI_v10.2";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
