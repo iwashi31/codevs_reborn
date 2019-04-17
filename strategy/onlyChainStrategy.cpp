@@ -8,19 +8,25 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
     return score < a.score;
 }
 
-OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true) {}
+OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.20";
+    return "iwashiAI_v1.21";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
     this->game = &game;
 
+    if (prevObstacleStock >= 10 && game.player[0].obstacleStock < 10) {
+        bulkSearchFlag = true;
+    }
+
+    prevObstacleStock = game.player[0].obstacleStock;
+
     if (game.player[0].obstacleStock < 10 && bulkSearchFlag) {
         bulkSearchFlag = false;
-        if (game.turn == 0) return firstSearch(15, 18);
-        return firstSearch(15, 5);
+        if (game.turn == 0) return bulkSearch(15, 18);
+        return bulkSearch(15, 5);
     }
 
     if (!actionQueue.empty()) {
@@ -88,14 +94,20 @@ Action OnlyChainStrategy::getAction(Game &game) {
         return bestAction;
     }
 
-    return chokudaiSearch(5, 0.6);
+    noBulkCount++;
+    if (noBulkCount >= 5) {
+        bulkSearchFlag = true;
+        noBulkCount = 0;
+    }
+
+    return singleSearch(5, 0.6);
 }
 
 void OnlyChainStrategy::clearQueue() {
     while (!actionQueue.empty()) actionQueue.pop();
 }
 
-Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
+Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
     int turn = game->turn;
     if (turn + depth > MAX_TURN_NUM) {
         depth = MAX_TURN_NUM - turn;
@@ -141,18 +153,21 @@ Action OnlyChainStrategy::chokudaiSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
+Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
+    cerr << "bulk search!" << endl;
+
     Timer timer;
-    vector<priority_queue<State>> q(static_cast<unsigned int>(depth + 1));
+    vector<set<State>> q(static_cast<unsigned int>(depth + 1));
     vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
-    q[0].push(State(game->player[0], 0));
+    q[0].insert(State(game->player[0], 0));
     int width = 0;
     vector<State> statePool;
     while (timer.getTime() < timeLimit) {
         width++;
         rep(i, depth) {
             if (q[i].empty()) continue;
-            State state = q[i].top(); q[i].pop();
+            auto it = q[i].end(); it--;
+            State state = *it; q[i].erase(it);
 
             REP(position, 2, 7) rep(rotation, 4) {
                 auto nextState = state;
@@ -176,10 +191,12 @@ Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
                 if (pushedHash[i + 1].find(hash) != pushedHash[i + 1].end()) continue;
                 pushedHash[i + 1].insert(hash);
 
-                q[i + 1].push(nextState);
+                q[i + 1].insert(nextState);
+                if (q[i + 1].size() > 10000) {
+                    q[i + 1].erase(q[i + 1].begin());
+                }
             }
         }
-        if (width == 3500) break;
     }
 
     if (statePool.empty()) {
@@ -194,6 +211,8 @@ Action OnlyChainStrategy::firstSearch(int depth, double timeLimit) {
         }
         return val1 > val2;
     });
+
+    noBulkCount = 0;
 
     State bestState = statePool[0];
     Action& bestAction = bestState.actions[0];

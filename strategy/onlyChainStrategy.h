@@ -26,11 +26,13 @@ private:
 
     Game* game;
 
+    int prevObstacleStock;
     bool bulkSearchFlag;
+    int noBulkCount;
     queue<Action> actionQueue;
 
-    Action chokudaiSearch(int depth, double timeLimit);
-    Action firstSearch(int depth, double timeLimit);
+    Action singleSearch(int depth, double timeLimit);
+    Action bulkSearch(int depth, double timeLimit);
     long long calcFieldScore(Field& field);
 
 public:
