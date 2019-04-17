@@ -2,9 +2,10 @@
 #include "strategy/randomStrategy.h"
 #include "strategy/onlyChainStrategy.h"
 #include "strategy/prioritizeSkillStrategy.h"
+#include "strategy/antiSkillStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new OnlyChainStrategy();
+    IStrategy* strategy = new AntiSkillStrategy();
 
     Field::initHashSeed();
 
