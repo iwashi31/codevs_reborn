@@ -10,3 +10,7 @@ cmake-build-debug/
 *.out
 
 logs/
+
+codevs/replay/
+
+codevs/
