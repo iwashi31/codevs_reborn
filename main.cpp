@@ -6,7 +6,7 @@
 #include "strategy/switchableStrategy.h"
 
 int main(int argc, char* argv[]) {
-    IStrategy* strategy = new OnlyChainStrategy();
+    IStrategy* strategy = new SwitchableStrategy();
 
     Field::initHashSeed();
 

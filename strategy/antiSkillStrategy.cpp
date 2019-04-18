@@ -11,7 +11,7 @@ bool AntiSkillStrategy::State::operator<(const AntiSkillStrategy::State &a) cons
 AntiSkillStrategy::AntiSkillStrategy() : game(nullptr) {}
 
 string AntiSkillStrategy::getName() {
-    return "iwashiAI_v3.2";
+    return "iwashiAI_v3.3";
 }
 
 Action AntiSkillStrategy::getAction(Game &game) {
@@ -46,20 +46,24 @@ Action AntiSkillStrategy::getAction(Game &game) {
     }
     sort(all(q), [](State &s1, State &s2) {
         int t1 = 3, t2 = 3;
-        int c1 = 0, c2 = 0;
+        int a1 = 0, a2 = 0;
         rep(i, s1.chains.size()) {
             if (s1.chains[i] == 3) {
                 t1 = min(t1, i);
-                c1++;
+                a1--;
+            } else if (s1.chains[i] < 3) {
+                a1 += s1.chains[i];
             }
         }
         rep(i, s2.chains.size()) {
             if (s2.chains[i] == 3) {
                 t2 = min(t2, i);
-                c2++;
+                a2--;
+            } else if (s2.chains[i] < 3) {
+                a2 += s2.chains[i];
             }
         }
-        if (t1 == t2) return c1 > c2;
+        if (t1 == t2) return a1 < a2;
         return t1 < t2;
     });
 
@@ -74,9 +78,9 @@ Action AntiSkillStrategy::getAction(Game &game) {
         cerr << chain << "_";
     }
     cerr << endl;
-    if (!bestState.actions.empty() && bestState.chains.back() == 3) {
+    if (!bestState.actions.empty() && *max_element(all(bestState.chains)) >= 3) {
         return bestState.actions[0];
     }
 
-    return OnlyChainStrategy().getAction(game);
+    return OnlyChainStrategy(false).getAction(game);
 }

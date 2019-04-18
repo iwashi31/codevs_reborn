@@ -10,6 +10,10 @@ private:
 
     Game* game;
 
+    // 大連鎖を放ったか否か
+    bool isChained;
+    vector<Game> gameHistory;
+
     bool skillPrioritizeCheck();
 
 public:

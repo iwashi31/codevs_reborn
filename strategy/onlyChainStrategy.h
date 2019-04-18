@@ -37,6 +37,7 @@ private:
 
 public:
     OnlyChainStrategy();
+    OnlyChainStrategy(bool bulkSearchFlag);
 
     string getName() override;
     Action getAction(Game& game) override;
