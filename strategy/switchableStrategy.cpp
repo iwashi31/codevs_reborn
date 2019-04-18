@@ -7,7 +7,7 @@
 SwitchableStrategy::SwitchableStrategy() : game(nullptr) {}
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.4";
+    return "iwashiAI_v10.5";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
@@ -34,7 +34,8 @@ bool SwitchableStrategy::skillPrioritizeCheck() {
     for (int i = game->turn - 1; i >= max(0, game->turn - 10); i--) {
         int blocks1 = gameHistory[i + 1].player[1].field.countNumberBlock();
         int blocks2 = gameHistory[i].player[1].field.countNumberBlock();
-        if (blocks1 <= blocks2 + 3) chainCnt++;
+        if (blocks1 < blocks2 + 3) chainCnt++;
     }
+    cerr << "chainCnt:" << chainCnt << endl;
     return chainCnt >= 5;
 }
