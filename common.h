@@ -2,6 +2,7 @@
 #define CODEVS_REBORN_COMMON_H
 
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <string>
 #include <cstring>
