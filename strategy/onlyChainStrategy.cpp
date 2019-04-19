@@ -43,7 +43,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     int bestChain = 0;
     int bestChain1 = 0, bestChain2 = 0, bestChain3 = 0;
-    int bestBlockLeft = INT_MAX;
+    int bestBlockLeft = 1234567;
     unordered_set<unsigned long long> visitedHash[2];
     Action bestAction{}, bestAction2{}, bestAction3{};
     Player tmpPlayer = game.player[0];
