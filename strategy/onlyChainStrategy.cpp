@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.23";
+    return "iwashiAI_v1.24";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -194,15 +194,16 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
             REP(position, 2, 7) rep(rotation, 4) {
                 auto nextState = state;
                 nextState.player.fallObstacles();
-                int chain = nextState.player.field.dropPack(game->packs[game->turn + i], position, rotation);
-                if (chain == -1) continue;
-                if (chain >= 2 && chain < 12) continue;
+                ChainInfo chainInfo = nextState.player.field.dropPackWithInfo(game->packs[game->turn + i], position, rotation);
+                if (chainInfo.chainNum == -1) continue;
+                if (chainInfo.chainNum >= 2 && chainInfo.chainNum < 12) continue;
 
                 nextState.score += calcFieldScore(nextState.player.field, allowErase);
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
-                nextState.chains.push_back(chain);
+                nextState.chains.push_back(chainInfo.chainNum);
 
-                if (chain >= 12) {
+                if (chainInfo.chainNum >= 12) {
+                    nextState.chainInfo = chainInfo;
                     statePool.push_back(nextState);
                     continue;
                 }
@@ -230,13 +231,16 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     sort(all(statePool), [](State &s1, State &s2) {
-        int val1 = s1.chains.back() - s1.actions.size();
-        int val2 = s2.chains.back() - s2.actions.size();
+        int val1 = s1.chainInfo.chainNum - s1.actions.size();
+        int val2 = s2.chainInfo.chainNum - s2.actions.size();
         if (val1 == val2) {
             if (s1.actions.size() == s2.actions.size()) {
-                int b1 = s1.player.field.countNumberBlock();
-                int b2 = s2.player.field.countNumberBlock();
-                return b1 > b2;
+                int b1 = s1.chainInfo.eraseBlockNum;
+                int b2 = s2.chainInfo.eraseBlockNum;
+                if (b1 == b2) {
+                    return s1.chainInfo.robustNum > s2.chainInfo.robustNum;
+                }
+                return b1 < b2;
             }
             return s1.actions.size() < s2.actions.size();
         }
@@ -249,7 +253,8 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     Action& bestAction = bestState.actions[0];
 
     cerr << "turn:" << game->turn + bestState.actions.size();
-    cerr << "chain:" << bestState.chains.back() << endl;
+    cerr << " chain:" << bestState.chainInfo.chainNum;
+    cerr << " robust:" << bestState.chainInfo.robustNum << endl;
     //if (game->turn == 0) {
     //    ofstream fout("chain.log", ios::app);
     //    fout << bestState.actions.size() << " " << bestState.chains.back() << endl;

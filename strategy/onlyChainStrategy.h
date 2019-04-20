@@ -12,6 +12,7 @@ private:
         long long score;
         vector<Action> actions;
         vector<int> chains;
+        ChainInfo chainInfo;
 
         State();
         State(Player& player, int score);

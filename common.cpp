@@ -517,20 +517,42 @@ int Field::drop() {
 }
 
 ChainInfo Field::dropWithInfo() {
-    int chains = 0;
-    int eraseSum = 0;
+    ChainInfo info;
     while (true) {
-        freeFall();
-        int eraseNum = eraseBlocks();
+        int eraseNum;
+        if (info.chainNum == 0) {
+            RowField prevField = field;
+            freeFall();
+            eraseNum = eraseBlocks();
+            info.robustNum = [&]() {
+                rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+                    if (prevField[y][x] != 0 && field[y][x] == 0) {
+                        info.erasePoint = Point(x, y);
+                        REP(dy, -1, 2) {
+                            int ny = y + dy;
+                            if (ny < 0) continue;
+                            if ((x - 1 >= 0 && prevField[ny][x - 1] == 0)
+                                || (x + 1 < FIELD_WIDTH && prevField[ny][x + 1] == 0)) {
+                                return 1 - dy;
+                            }
+                        }
+                    }
+                }
+                return -1;
+            }();
+        } else {
+            freeFall();
+            eraseNum = eraseBlocks();
+        }
         if (eraseNum == 0) {
-            if (!isAlive()) chains = -1;
+            if (!isAlive()) info.chainNum = -1;
             break;
         }
-        eraseSum += eraseNum;
-        chains++;
+        info.eraseBlockNum += eraseNum;
+        info.chainNum++;
     }
 
-    return ChainInfo(chains, eraseSum, 0);
+    return info;
 }
 
 void Field::update(int x, int y, int block) {

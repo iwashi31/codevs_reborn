@@ -68,8 +68,9 @@ struct ChainInfo {
     int chainNum;
     int eraseBlockNum;
     int robustNum;
+    Point erasePoint;
 
-    ChainInfo(int chainNum, int eraseBlockNum, int robustNum) : chainNum(chainNum), eraseBlockNum(eraseBlockNum), robustNum(robustNum) {};
+    ChainInfo() : chainNum(0), eraseBlockNum(0), robustNum(-2), erasePoint(-1, -1) {};
 };
 
 class Field {
