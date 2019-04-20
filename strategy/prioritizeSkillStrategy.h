@@ -30,7 +30,6 @@ private:
     Action chokudaiSearch(int depth, double timeLimit);
     void bulkSearch(int depth, double timeLimit);
     int calcFieldScore(Player& player, int chain);
-    int countExplodeBlockNum(Field& field);
 
 public:
     PrioritizeSkillStrategy();

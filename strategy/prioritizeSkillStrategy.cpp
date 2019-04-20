@@ -31,7 +31,7 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
         }
     }
 
-    int explodeBlockNum = countExplodeBlockNum(game.player[0].field);
+    int explodeBlockNum = game.player[0].field.countExplodeBlockNum();
     if (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM) {
         if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD && explodeBlockNum >= 30) {
             return Action::createExplodeAction();
@@ -133,13 +133,13 @@ void PrioritizeSkillStrategy::bulkSearch(int depth, double timeLimit) {
     State bestState = q.back().top();
     for (auto &action : bestState.actions) actionQueue.push(action);
 
-    cerr << "gage:" << bestState.player.skillGage << " num:" << countExplodeBlockNum(bestState.player.field) << endl;
+    cerr << "gage:" << bestState.player.skillGage << " num:" << bestState.player.field.countExplodeBlockNum() << endl;
 }
 
 int PrioritizeSkillStrategy::calcFieldScore(Player& player, int chain) {
     Field& field = player.field;
     int score = 0;
-    score = 100 * (countExplodeBlockNum(field) + min(player.skillGage, 80));
+    score = 100 * (field.countExplodeBlockNum() + min(player.skillGage, 80));
     if (chain > 1) {
         score -= 100000000;
     }
@@ -147,19 +147,3 @@ int PrioritizeSkillStrategy::calcFieldScore(Player& player, int chain) {
     return score;
 }
 
-int PrioritizeSkillStrategy::countExplodeBlockNum(Field& field) {
-    int cnt = 0;
-    rep(y, FIELD_HEIGHT + PACK_SIZE) rep(x, FIELD_WIDTH) {
-        if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
-        cnt += [&]() {
-            for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {
-                int nx = x + dx;
-                int ny = y + dy;
-                if (!field.inField(nx, ny)) continue;
-                if (field[ny][nx] == EXPLODE_NUM) return 1;
-            }
-            return 0;
-        }();
-    }
-    return cnt;
-}

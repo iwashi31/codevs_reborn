@@ -576,6 +576,23 @@ int Field::countBlock() {
     return cnt;
 }
 
+int Field::countExplodeBlockNum() {
+    int cnt = 0;
+    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+            if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
+            cnt += [&]() {
+                for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (!inField(nx, ny)) continue;
+                        if (field[ny][nx] == EXPLODE_NUM) return 1;
+                    }
+                return 0;
+            }();
+        }
+    return cnt;
+}
+
 int Field::getMaxBlockHeight() {
     for (int y = FIELD_HEIGHT + PACK_SIZE; y >= 0; y--) rep(x, FIELD_WIDTH) {
         if (field[y][x] != 0) return y;
