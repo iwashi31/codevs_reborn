@@ -64,6 +64,14 @@ public:
     Point(int x, int y);
 };
 
+struct ChainInfo {
+    int chainNum;
+    int eraseBlockNum;
+    int robustNum;
+
+    ChainInfo(int chainNum, int eraseBlockNum, int robustNum) : chainNum(chainNum), eraseBlockNum(eraseBlockNum), robustNum(robustNum) {};
+};
+
 class Field {
 private:
     static long long hashSeed[FIELD_HEIGHT + PACK_SIZE + 1][FIELD_WIDTH][OBSTACLE + 1];
@@ -88,6 +96,8 @@ public:
     // 返り値は連鎖数。ただし、デンジャーゾーンを超えた場合 -1 が返る
     int dropPack(const Pack& pack, int position, int rotation);
     int drop();
+    ChainInfo dropPackWithInfo(const Pack& pack, int position, int rotation);
+    ChainInfo dropWithInfo();
 
     // 点 (x, y) がフィールド内の点か否かを返す
     bool inField(int x, int y);

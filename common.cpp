@@ -479,6 +479,10 @@ bool Field::inField(int x, int y) {
 }
 
 int Field::dropPack(const Pack &pack, int position, int rotation) {
+    return dropPackWithInfo(pack, position, rotation).chainNum;
+}
+
+ChainInfo Field::dropPackWithInfo(const Pack &pack, int position, int rotation) {
     assert(position >= 0 && position < FIELD_WIDTH - 1);
     if (rotation == 0) {
         field[FIELD_HEIGHT + 1][position] = pack[0][0];
@@ -505,11 +509,16 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
     columnUpdated[position] = true;
     columnUpdated[position + 1] = true;
 
-    return drop();
+    return dropWithInfo();
 }
 
 int Field::drop() {
+    return dropWithInfo().chainNum;
+}
+
+ChainInfo Field::dropWithInfo() {
     int chains = 0;
+    int eraseSum = 0;
     while (true) {
         freeFall();
         int eraseNum = eraseBlocks();
@@ -517,10 +526,11 @@ int Field::drop() {
             if (!isAlive()) chains = -1;
             break;
         }
+        eraseSum += eraseNum;
         chains++;
     }
 
-    return chains;
+    return ChainInfo(chains, eraseSum, 0);
 }
 
 void Field::update(int x, int y, int block) {
