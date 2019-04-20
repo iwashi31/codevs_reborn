@@ -12,11 +12,16 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.22";
+    return "iwashiAI_v1.23";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
     this->game = &game;
+
+    //if (game.turn == 1) {
+    //    Timer timer;
+    //    while (timer.getTime() < 2.0) continue;
+    //}
 
     if (prevObstacleStock >= 10 && game.player[0].obstacleStock < 10) {
         bulkSearchFlag = true;
@@ -117,6 +122,9 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
         depth = MAX_TURN_NUM - turn;
     }
 
+    vector<bool> allowErase(10);
+    rep(i, 10) allowErase[i] = true;
+
     Timer timer;
     vector<priority_queue<State>> q(static_cast<unsigned int>(depth + 1));
     vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
@@ -138,7 +146,7 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
                 if (pushedHash[i + 1].find(hash) != pushedHash[i + 1].end()) continue;
                 pushedHash[i + 1].insert(hash);
 
-                nextState.score += calcFieldScore(nextState.player.field);
+                nextState.score += calcFieldScore(nextState.player.field, allowErase);
                 if (position < 2 || position > 7) nextState.score -= 1000;
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
@@ -160,6 +168,16 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
 Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     cerr << "bulk search!" << endl;
 
+    vector<bool> allowErase(10);
+    if (game->turn > 0) {
+        rep(i, 10) allowErase[i] = true;
+    } else {
+        rep(i, 10) allowErase[i] = false;
+        REP(t, 9, 11) {
+            rep(y, PACK_SIZE) rep(x, PACK_SIZE) allowErase[game->packs[t][y][x]] = true;
+        }
+    }
+
     Timer timer;
     vector<set<State>> q(static_cast<unsigned int>(depth + 1));
     vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
@@ -180,7 +198,7 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
                 if (chain == -1) continue;
                 if (chain >= 2 && chain < 12) continue;
 
-                nextState.score += calcFieldScore(nextState.player.field);
+                nextState.score += calcFieldScore(nextState.player.field, allowErase);
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chain);
 
@@ -244,14 +262,14 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-long long OnlyChainStrategy::calcFieldScore(Field& field) {
+long long OnlyChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
     int maxChain = 0;
 
     int maxHeight = 0;
     rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0) continue;
         maxHeight = max(maxHeight, y);
-        if (field[y][x] == OBSTACLE) continue;
+        if (field[y][x] == OBSTACLE || !allowErase[field[y][x]]) continue;
         if (field[y + 1][x] == 0) continue;
         if ((x > 1 && field[y + 1][x - 1] == 0)
             || (x < FIELD_WIDTH - 1 && field[y + 1][x + 1] == 0)) {
