@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.29";
+    return "iwashiAI_v1.30";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -181,6 +181,8 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
 void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     cerr << " bulk search!" << endl;
 
+    clearQueue();
+
     bulkSearchCount++;
 
     vector<bool> allowErase(10);
@@ -258,18 +260,18 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     sort(all(statePool), [](State &s1, State &s2) {
-        int val1 = s1.chainInfo.chainNum - s1.actions.size();
-        int val2 = s2.chainInfo.chainNum - s2.actions.size();
+        int val1 = (s1.chainInfo.chainNum - s1.actions.size()) * 2 + s1.chainInfo.robustNum;
+        int val2 = (s2.chainInfo.chainNum - s2.actions.size()) * 2 + s2.chainInfo.robustNum;
         if (val1 == val2) {
-            if (s1.actions.size() == s2.actions.size()) {
+            if (s1.actions.size() - s1.chainInfo.robustNum == s2.actions.size() - s2.chainInfo.robustNum) {
                 int b1 = s1.player.field.countNumberBlock();
                 int b2 = s2.player.field.countNumberBlock();
                 if (b1 == b2) {
                     return s1.chainInfo.robustNum > s2.chainInfo.robustNum;
                 }
-                return b1 < b2;
+                return b1 > b2;
             }
-            return s1.actions.size() < s2.actions.size();
+            return s1.actions.size() - s1.chainInfo.robustNum < s2.actions.size() - s2.chainInfo.robustNum;
         }
         return val1 > val2;
     });
@@ -288,7 +290,6 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     //    fout << bestState.actions.size() << " " << bestState.chains.back() << endl;
     //}
 
-    clearQueue();
     for (auto &action : bestState.actions) actionQueue.push(action);
 }
 
