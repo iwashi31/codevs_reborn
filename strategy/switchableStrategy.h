@@ -12,6 +12,7 @@ private:
 
     // 大連鎖を放ったか否か
     bool isChained;
+    bool isChainedEnemy;
     vector<Game> gameHistory;
 
     bool skillPrioritizeCheck();

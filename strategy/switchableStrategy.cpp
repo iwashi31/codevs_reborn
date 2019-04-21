@@ -7,7 +7,7 @@
 SwitchableStrategy::SwitchableStrategy() : game(nullptr) {}
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.11";
+    return "iwashiAI_v10.12";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
@@ -19,7 +19,13 @@ Action SwitchableStrategy::getAction(Game &game) {
         isChained = true;
     }
 
-    if (isChained && skillPrioritizeCheck()) {
+    if (!isChainedEnemy && game.turn > 0
+        && gameHistory[game.turn - 1].player[1].field.countNumberBlock() - game.player[1].field.countNumberBlock() >= 7) {
+        isChainedEnemy = true;
+        cerr << "Enemy chained!!!!" << endl;
+    }
+
+    if (isChained && !isChainedEnemy && skillPrioritizeCheck()) {
         cerr << "use AntiSkill" << endl;
         onlyChainStrategy.clearQueue();
         return antiSkillStrategy.getAction(game);
@@ -36,6 +42,6 @@ bool SwitchableStrategy::skillPrioritizeCheck() {
         int blocks2 = gameHistory[i].player[1].field.countNumberBlock();
         if (blocks1 < blocks2 + 3) chainCnt++;
     }
-    cerr << "chainRate:" << (double) chainCnt / (game->turn + 1) << endl;
+    cerr << "enemyChained:" << isChainedEnemy << endl;
     return chainCnt >= game->turn * 0.4;
 }
