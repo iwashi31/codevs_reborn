@@ -27,6 +27,7 @@ private:
 
     Game* game;
 
+    int bulkSearchCount;
     int stackedBlockLines;
     int prevObstacleStock;
     bool bulkSearchFlag;

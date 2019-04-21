@@ -8,11 +8,11 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
     return score < a.score;
 }
 
-OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0) {}
-OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0) {}
+OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0) {}
+OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.25";
+    return "iwashiAI_v1.26";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -34,7 +34,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
     if (game.player[0].obstacleStock < 10 && bulkSearchFlag) {
         bulkSearchFlag = false;
         if (game.turn == 0) return bulkSearch(15, 18);
-        return bulkSearch(15, 5);
+        return bulkSearch(15, max(10, 22 - 4 * bulkSearchCount));
     }
 
     if (!actionQueue.empty()) {
@@ -177,6 +177,8 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
 
 Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     cerr << "bulk search!" << endl;
+
+    bulkSearchCount++;
 
     vector<bool> allowErase(10);
     if (game->turn > 0) {
