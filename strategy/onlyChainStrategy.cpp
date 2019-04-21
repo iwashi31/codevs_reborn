@@ -16,6 +16,8 @@ string OnlyChainStrategy::getName() {
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
+    cerr << "call OnlyChain" << endl;
+
     this->game = &game;
 
     //if (game.turn == 1) {
@@ -39,6 +41,10 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     if (!actionQueue.empty()) {
         if (game.player[0].obstacleStock < 10) {
+            cerr << " q:";
+            rep(i, actionQueue.size()) cerr << "*";
+            cerr << endl;
+
             Action action = actionQueue.front();
             actionQueue.pop();
             if (actionQueue.empty()) bulkSearchFlag = true;
@@ -94,8 +100,8 @@ Action OnlyChainStrategy::getAction(Game &game) {
         }
     }
     bestChain /= 10;
-    cerr << "turn:" << game.turn << endl;
-    cerr << "bestChain:" << bestChain1 << ", " << bestChain2 << ", " << bestChain3 << endl;
+    cerr << " brute force" << endl;
+    cerr << "  bestChain:" << bestChain1 << ", " << bestChain2 << ", " << bestChain3 << endl;
     if (bestChain >= 10) {
         actionQueue.push(bestAction2);
         actionQueue.push(bestAction3);
@@ -176,7 +182,7 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
 }
 
 Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
-    cerr << "bulk search!" << endl;
+    cerr << " bulk search!" << endl;
 
     bulkSearchCount++;
 
@@ -273,7 +279,7 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     State bestState = statePool[0];
     Action& bestAction = bestState.actions[0];
 
-    cerr << "turn:" << game->turn + bestState.actions.size();
+    cerr << "  turn:" << bestState.actions.size();
     cerr << " chn:" << bestState.chainInfo.chainNum;
     cerr << " lft:" << bestState.player.field.countNumberBlock();
     cerr << " rbst:" << bestState.chainInfo.robustNum << endl;

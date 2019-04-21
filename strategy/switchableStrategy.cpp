@@ -14,6 +14,8 @@ Action SwitchableStrategy::getAction(Game &game) {
     this->game = &game;
     gameHistory.push_back(game);
 
+    cerr << "--- turn " << game.turn << " ---" << endl;
+
     if (game.turn > 0
         && gameHistory[game.turn - 1].player[0].field.countNumberBlock() - game.player[0].field.countNumberBlock() >= 20) {
         isChained = true;
@@ -21,17 +23,15 @@ Action SwitchableStrategy::getAction(Game &game) {
 
     if (!isChainedEnemy && game.turn > 0
         && gameHistory[game.turn - 1].player[1].field.countNumberBlock() - game.player[1].field.countNumberBlock() >= 7) {
+        cerr << " enemy chained!" << endl;
         isChainedEnemy = true;
-        cerr << "Enemy chained!!!!" << endl;
     }
 
     if (isChained && !isChainedEnemy && skillPrioritizeCheck()) {
-        cerr << "use AntiSkill" << endl;
         onlyChainStrategy.clearQueue();
         return antiSkillStrategy.getAction(game);
     }
 
-    cerr << "use OnlyChain" << endl;
     return onlyChainStrategy.getAction(game);
 }
 
@@ -42,6 +42,5 @@ bool SwitchableStrategy::skillPrioritizeCheck() {
         int blocks2 = gameHistory[i].player[1].field.countNumberBlock();
         if (blocks1 < blocks2 + 3) chainCnt++;
     }
-    cerr << "enemyChained:" << isChainedEnemy << endl;
     return chainCnt >= game->turn * 0.4;
 }

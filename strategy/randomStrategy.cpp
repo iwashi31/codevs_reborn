@@ -6,6 +6,8 @@ string RandomStrategy::getName() {
 }
 
 Action RandomStrategy::getAction(Game &game) {
+    cerr << "call Random" << endl;
+
     auto& me = game.player[0];
     if (me.skillGage >= SKILL_GAGE_THRESHOLD) {
         return Action::createExplodeAction();

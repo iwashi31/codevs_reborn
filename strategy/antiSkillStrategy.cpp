@@ -15,6 +15,8 @@ string AntiSkillStrategy::getName() {
 }
 
 Action AntiSkillStrategy::getAction(Game &game) {
+    cerr << "call AntiSkill" << endl;
+
     this->game = &game;
 
     if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD && game.player[0].field.countExplodeBlockNum() > 0) {
@@ -73,7 +75,7 @@ Action AntiSkillStrategy::getAction(Game &game) {
 
     State bestState = q[0];
 
-    cerr << "chains:";
+    cerr << " chains:";
     for (auto chain : bestState.chains) {
         cerr << chain << "_";
     }
