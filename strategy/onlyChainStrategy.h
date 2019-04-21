@@ -35,7 +35,7 @@ private:
     queue<Action> actionQueue;
 
     Action singleSearch(int depth, double timeLimit);
-    Action bulkSearch(int depth, double timeLimit);
+    void bulkSearch(int depth, double timeLimit);
     long long calcFieldScore(Field& field, vector<bool> &allowErase);
 
 public:

@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.28";
+    return "iwashiAI_v1.29";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -37,7 +37,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     if (bulkSearchFlag) {
         bulkSearchFlag = false;
-        return bulkSearch(15, min(18, max(10, 22 - 4 * bulkSearchCount)));
+        bulkSearch(15, min(18, max(10, 22 - 4 * bulkSearchCount)));
     }
 
     if (!actionQueue.empty()) {
@@ -178,7 +178,7 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
+void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     cerr << " bulk search!" << endl;
 
     bulkSearchCount++;
@@ -253,7 +253,8 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
         //    ofstream fout("chain.log", ios::app);
         //    fout << "-1 -1" << endl;
         //}
-        return RandomStrategy().getAction(*game);
+        cerr << "  failed" << endl;
+        return;
     }
 
     sort(all(statePool), [](State &s1, State &s2) {
@@ -289,9 +290,6 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
 
     clearQueue();
     for (auto &action : bestState.actions) actionQueue.push(action);
-    actionQueue.pop();
-
-    return bestAction;
 }
 
 long long OnlyChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
