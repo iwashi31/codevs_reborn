@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.27";
+    return "iwashiAI_v1.28";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -27,31 +27,28 @@ Action OnlyChainStrategy::getAction(Game &game) {
 
     if (game.player[0].obstacleStock >= 10) stackedBlockLines++;
 
-    if (prevObstacleStock >= 10 && game.player[0].obstacleStock < 10) {
+    if ((game.player[0].obstacleStock / 10 > prevObstacleStock / 10)
+        || (prevObstacleStock / 10 > 0 && game.player[0].obstacleStock / 10 == prevObstacleStock / 10)) {
         bulkSearchFlag = true;
+        clearQueue();
     }
 
     prevObstacleStock = game.player[0].obstacleStock;
 
-    if (game.player[0].obstacleStock < 10 && bulkSearchFlag) {
+    if (bulkSearchFlag) {
         bulkSearchFlag = false;
-        if (game.turn == 0) return bulkSearch(15, 18);
-        return bulkSearch(15, max(10, 22 - 4 * bulkSearchCount));
+        return bulkSearch(15, min(18, max(10, 22 - 4 * bulkSearchCount)));
     }
 
     if (!actionQueue.empty()) {
-        if (game.player[0].obstacleStock < 10) {
-            cerr << " q:";
-            rep(i, actionQueue.size()) cerr << "*";
-            cerr << endl;
+        cerr << " q:";
+        rep(i, actionQueue.size()) cerr << "*";
+        cerr << endl;
 
-            Action action = actionQueue.front();
-            actionQueue.pop();
-            if (actionQueue.empty()) bulkSearchFlag = true;
-            return action;
-        } else {
-            clearQueue();
-        }
+        Action action = actionQueue.front();
+        actionQueue.pop();
+        if (actionQueue.empty()) bulkSearchFlag = true;
+        return action;
     }
 
     int bestChain = 0;
@@ -205,6 +202,8 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
         endX = FIELD_WIDTH - 1;
     }
 
+    const int lowerChainNum = 12;
+
     Timer timer;
     vector<set<State>> q(static_cast<unsigned int>(depth + 1));
     vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
@@ -223,13 +222,13 @@ Action OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
                 nextState.player.fallObstacles();
                 ChainInfo chainInfo = nextState.player.field.dropPackWithInfo(game->packs[game->turn + i], position, rotation);
                 if (chainInfo.chainNum == -1) continue;
-                if (chainInfo.chainNum >= 2 && chainInfo.chainNum < 11) continue;
+                if (chainInfo.chainNum >= 2 && chainInfo.chainNum < lowerChainNum) continue;
 
                 nextState.score += calcFieldScore(nextState.player.field, allowErase);
                 nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                 nextState.chains.push_back(chainInfo.chainNum);
 
-                if (chainInfo.chainNum >= 11) {
+                if (chainInfo.chainNum >= lowerChainNum) {
                     nextState.chainInfo = chainInfo;
                     statePool.push_back(nextState);
                     continue;
