@@ -8,11 +8,11 @@ bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) cons
     return score < a.score;
 }
 
-OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0) {}
-OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0) {}
+OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
+OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.26";
+    return "iwashiAI_v1.27";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
