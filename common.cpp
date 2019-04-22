@@ -593,6 +593,38 @@ int Field::countExplodeBlockNum() {
     return cnt;
 }
 
+int Field::countAvailableCell() {
+    int dx[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+    int dy[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+    bool visited[FIELD_HEIGHT][FIELD_WIDTH];
+    memset(visited, false, sizeof(visited));
+
+    queue<Point> q;
+    rep(x, FIELD_WIDTH) {
+        if (field[FIELD_HEIGHT - 1][x] == OBSTACLE) continue;
+        q.push(Point(x, FIELD_HEIGHT - 1));
+        visited[FIELD_HEIGHT - 1][x] = true;
+    }
+
+    int cnt = 0;
+    while (!q.empty()) {
+        auto p = q.front(); q.pop();
+        cnt++;
+        rep(dir, 8) {
+            int nx = p.x + dx[dir];
+            int ny = p.y + dy[dir];
+            if (nx < 0 || nx >= FIELD_WIDTH || ny < 0 || ny >= FIELD_HEIGHT) continue;
+            if (field[ny][nx] == OBSTACLE) continue;
+            if (visited[ny][nx]) continue;
+            visited[ny][nx] = true;
+            q.push(Point(nx, ny));
+        }
+    }
+
+    return cnt;
+}
+
 int Field::getMaxBlockHeight() {
     for (int y = FIELD_HEIGHT + PACK_SIZE; y >= 0; y--) rep(x, FIELD_WIDTH) {
         if (field[y][x] != 0) return y;

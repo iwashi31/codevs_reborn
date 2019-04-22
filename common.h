@@ -111,6 +111,9 @@ public:
     int countBlock();
     int countExplodeBlockNum();
 
+    // ブロックで埋められていないセルの数を返す
+    int countAvailableCell();
+
     // 一番高いところにあるブロックの y 座標を返す
     int getMaxBlockHeight();
 
