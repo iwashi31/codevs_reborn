@@ -56,6 +56,11 @@ extern const int EXPLODE_SCORE[];           // 爆発スコア
 using Pack = array<array<int, PACK_SIZE>, PACK_SIZE>;
 using RowField = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT + PACK_SIZE + 1>;
 
+namespace logUtil {
+    static int isLocalCache = 0;
+    bool isLocal();
+}
+
 class Point {
 public:
     int x{}, y{};

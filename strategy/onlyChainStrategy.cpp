@@ -251,10 +251,10 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     if (statePool.empty()) {
-        //if (game->turn == 0) {
-        //    ofstream fout("chain.log", ios::app);
-        //    fout << "-1 -1" << endl;
-        //}
+        if (game->turn == 0 && logUtil::isLocal()) {
+            ofstream fout("logs/" + getName() + ".log", ios::app);
+            fout << "-1 -1" << endl;
+        }
         cerr << "  failed" << endl;
         return;
     }
@@ -285,10 +285,10 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     cerr << " chn:" << bestState.chainInfo.chainNum;
     cerr << " lft:" << bestState.player.field.countNumberBlock();
     cerr << " rbst:" << bestState.chainInfo.robustNum << endl;
-    //if (game->turn == 0) {
-    //    ofstream fout("chain.log", ios::app);
-    //    fout << bestState.actions.size() << " " << bestState.chains.back() << endl;
-    //}
+    if (game->turn == 0 && logUtil::isLocal()) {
+        ofstream fout("logs/" + getName() + ".log", ios::app);
+        fout << bestState.actions.size() << " " << bestState.chains.back() << endl;
+    }
 
     for (auto &action : bestState.actions) actionQueue.push(action);
 }

@@ -416,6 +416,15 @@ const int EXPLODE_SCORE[] = {
         258031  // 160 blocks
 };
 
+bool logUtil::isLocal() {
+    if (isLocalCache == 0) {
+        auto fp = fopen(".local", "r");
+        isLocalCache = fp == nullptr ? -1 : 1;
+        fclose(fp);
+    }
+    return isLocalCache == 1;
+}
+
 Point::Point() = default;
 Point::Point(int x, int y) : x(x), y(y) {}
 

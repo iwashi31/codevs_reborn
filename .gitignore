@@ -14,3 +14,7 @@ logs/
 codevs/replay/
 
 codevs/
+
+*.log
+
+\.local
