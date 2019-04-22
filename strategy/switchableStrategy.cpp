@@ -7,7 +7,7 @@
 SwitchableStrategy::SwitchableStrategy() : game(nullptr) {}
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.16";
+    return "iwashiAI_v10.17";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
@@ -15,6 +15,8 @@ Action SwitchableStrategy::getAction(Game &game) {
     gameHistory.push_back(game);
 
     cerr << "--- turn " << game.turn << " ---" << endl;
+
+    cerr << " ac:" << game.player[0].field.countAvailableCell() << "-" << game.player[1].field.countAvailableCell() << endl;
 
     if (game.turn > 0
         && gameHistory[game.turn - 1].player[0].field.countNumberBlock() - game.player[0].field.countNumberBlock() >= 20) {

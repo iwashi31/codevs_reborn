@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.31";
+    return "iwashiAI_v1.32";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -109,7 +109,7 @@ Action OnlyChainStrategy::getAction(Game &game) {
     }
 
     noBulkCount++;
-    if (noBulkCount >= 5) {
+    if (noBulkCount >= 3) {
         bulkSearchFlag = true;
         noBulkCount = 0;
     }
