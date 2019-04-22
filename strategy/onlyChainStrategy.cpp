@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.30";
+    return "iwashiAI_v1.31";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -204,7 +204,7 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
         endX = FIELD_WIDTH - 1;
     }
 
-    const int lowerChainNum = 12;
+    const int lowerChainNum = 11;
 
     Timer timer;
     vector<set<State>> q(static_cast<unsigned int>(depth + 1));
