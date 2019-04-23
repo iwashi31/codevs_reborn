@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.32";
+    return "iwashiAI_v1.33";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -220,6 +220,8 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
             State state = *it; q[i].erase(it);
 
             REP(position, startX, endX) rep(rotation, 4) {
+                if (game->turn == 0 && i <= depth / 2 && (rng.rand() & 3) == 0) continue;
+
                 auto nextState = state;
                 nextState.player.fallObstacles();
                 ChainInfo chainInfo = nextState.player.field.dropPackWithInfo(game->packs[game->turn + i], position, rotation);
@@ -260,8 +262,8 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     sort(all(statePool), [](State &s1, State &s2) {
-        int val1 = (s1.chainInfo.chainNum - s1.actions.size()) * 2 + s1.chainInfo.robustNum;
-        int val2 = (s2.chainInfo.chainNum - s2.actions.size()) * 2 + s2.chainInfo.robustNum;
+        int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum;
+        int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum;
         if (val1 == val2) {
             if (s1.actions.size() - s1.chainInfo.robustNum == s2.actions.size() - s2.chainInfo.robustNum) {
                 int b1 = s1.player.field.countNumberBlock();
