@@ -4,6 +4,9 @@
 #include "../common.h"
 
 class RandomStrategy : public IStrategy {
+private:
+    Logger logger;
+
 public:
     string getName() override;
     Action getAction(Game& game) override;

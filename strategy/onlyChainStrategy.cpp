@@ -16,7 +16,7 @@ string OnlyChainStrategy::getName() {
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
-    cerr << "call OnlyChain" << endl;
+    logger.printLine("call OnlyChain");
 
     this->game = &game;
 
@@ -41,9 +41,9 @@ Action OnlyChainStrategy::getAction(Game &game) {
     }
 
     if (!actionQueue.empty()) {
-        cerr << " q:";
-        rep(i, actionQueue.size()) cerr << "*";
-        cerr << endl;
+        logger.print(" q:");
+        rep(i, actionQueue.size()) logger.print("*");
+        logger.printLine();
 
         Action action = actionQueue.front();
         actionQueue.pop();
@@ -97,8 +97,13 @@ Action OnlyChainStrategy::getAction(Game &game) {
         }
     }
     bestChain /= 10;
-    cerr << " brute force" << endl;
-    cerr << "  bestChain:" << bestChain1 << ", " << bestChain2 << ", " << bestChain3 << endl;
+    logger.printLine(" brute force");
+    logger.print("  bestChain:");
+    logger.print(bestChain1);
+    logger.print(", ");
+    logger.print(bestChain2);
+    logger.print(", ");
+    logger.printLine(bestChain3);
     if (bestChain >= 10) {
         actionQueue.push(bestAction2);
         actionQueue.push(bestAction3);
@@ -179,7 +184,7 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
 }
 
 void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
-    cerr << " bulk search!" << endl;
+    logger.printLine(" bulk search!");
 
     clearQueue();
 
@@ -253,11 +258,7 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     if (statePool.empty()) {
-        if (game->turn == 0 && logUtil::isLocal()) {
-            ofstream fout("logs/" + getName() + ".log", ios::app);
-            fout << "-1 -1" << endl;
-        }
-        cerr << "  failed" << endl;
+        logger.printLine("  failed");
         return;
     }
 
@@ -283,14 +284,14 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     State bestState = statePool[0];
     Action& bestAction = bestState.actions[0];
 
-    cerr << "  turn:" << bestState.actions.size();
-    cerr << " chn:" << bestState.chainInfo.chainNum;
-    cerr << " lft:" << bestState.player.field.countNumberBlock();
-    cerr << " rbst:" << bestState.chainInfo.robustNum << endl;
-    if (game->turn == 0 && logUtil::isLocal()) {
-        ofstream fout("logs/" + getName() + ".log", ios::app);
-        fout << bestState.actions.size() << " " << bestState.chains.back() << endl;
-    }
+    logger.print("  turn:");
+    logger.print(bestState.actions.size());
+    logger.print("  chn:");
+    logger.print(bestState.chainInfo.chainNum);
+    logger.print("  lft:");
+    logger.print(bestState.player.field.countNumberBlock());
+    logger.print("  rbst:");
+    logger.printLine(bestState.chainInfo.robustNum);
 
     for (auto &action : bestState.actions) actionQueue.push(action);
 }

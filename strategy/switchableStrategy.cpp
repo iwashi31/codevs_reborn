@@ -20,7 +20,9 @@ Action SwitchableStrategy::getAction(Game &game) {
     this->game = &game;
     gameHistory.push_back(game);
 
-    cerr << "--- turn " << game.turn << " ---" << endl;
+    logger.print("--- turn ");
+    logger.print(game.turn);
+    logger.printLine(" ---");
 
     analyze();
 
@@ -31,7 +33,7 @@ Action SwitchableStrategy::getAction(Game &game) {
 
     if (!isChainedEnemy && game.turn > 0
         && gameHistory[game.turn - 1].player[1].field.countNumberBlock() - game.player[1].field.countNumberBlock() >= 7) {
-        cerr << " enemy chained!" << endl;
+        logger.printLine(" enemy chained!");
         isChainedEnemy = true;
     }
 
@@ -44,23 +46,27 @@ Action SwitchableStrategy::getAction(Game &game) {
 }
 
 void SwitchableStrategy::analyze() {
-    cerr << "start analyzing" << endl;
+    logger.printLine("start analyzing");
 
     Player me = game->player[0];
     Player enemy = game->player[1];
 
-    cerr << " ac:" << me.field.countAvailableCell() << "-" << enemy.field.countAvailableCell() << endl;
+    logger.print(" ac:");
+    logger.print(me.field.countAvailableCell());
+    logger.print("-");
+    logger.printLine(enemy.field.countAvailableCell());
 
     if (game->turn > 0) {
         long long enemyScoreDiff = enemy.score - gameHistory[game->turn - 1].player[1].score;
         if (enemyScoreDiff != 0) {
             rep(i, 30) {
                 if (enemyScoreDiff == CHAIN_SCORE[i]) {
-                    cerr << " enemy chain! : " << i << endl;
+                    logger.print(" enemy chain! : ");
+                    logger.printLine(i);
                     break;
                 }
                 if (i == 29) {
-                    cerr << " enemy bomb?" << endl;
+                    logger.printLine(" enemy bomb?");
                 }
             }
         }
@@ -83,15 +89,16 @@ void SwitchableStrategy::analyze() {
                 }
             }
         }
-        cerr << " fchain(" << name << "):";
+        logger.print(" fchain(" + name + "):");
         rep(i, depth) {
             int maxChain = -1;
             for (auto &state : states[i + 1]) {
                 maxChain = max(maxChain, state.chains.back());
             }
-            cerr << maxChain << "_";
+            logger.print(maxChain);
+            logger.print("_");
         }
-        cerr << endl;
+        logger.printLine();
     };
 
     analyzeNearChains(me, "me");

@@ -48,9 +48,14 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
         }
     } else assert(false);
 
-    cerr << "---" << endl;
-    cerr << "type :" << (searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM ? 0 : 1) << endl;
-    cerr << "turn:" << game.turn << " gage:" << game.player[0].skillGage << " num:" << explodeBlockNum << endl;
+    logger.print(" type :");
+    logger.printLine(searchType == SearchType::MAXIMIZE_EXPLODE_BLOCK_NUM ? 0 : 1);
+    logger.print(" turn:");
+    logger.print(game.turn);
+    logger.print(" gage:");
+    logger.print(game.player[0].skillGage);
+    logger.print(" num:");
+    logger.printLine(explodeBlockNum);
 
     return chokudaiSearch(10, 0.3);
 }
@@ -133,7 +138,10 @@ void PrioritizeSkillStrategy::bulkSearch(int depth, double timeLimit) {
     State bestState = q.back().top();
     for (auto &action : bestState.actions) actionQueue.push(action);
 
-    cerr << "gage:" << bestState.player.skillGage << " num:" << bestState.player.field.countExplodeBlockNum() << endl;
+    logger.print(" gage:");
+    logger.print(bestState.player.skillGage);
+    logger.print(" num:");
+    logger.printLine(bestState.player.field.countExplodeBlockNum());
 }
 
 int PrioritizeSkillStrategy::calcFieldScore(Player& player, int chain) {

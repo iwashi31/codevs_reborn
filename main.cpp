@@ -6,7 +6,12 @@
 #include "strategy/switchableStrategy.h"
 
 int main(int argc, char* argv[]) {
+    if (argc == 2 && string(argv[1]) == "--log") {
+        Logger::init();
+    }
     IStrategy* strategy = new SwitchableStrategy();
+
+    Logger().printLine("*** " + strategy->getName() + " ***");
 
     Field::initHashSeed();
 

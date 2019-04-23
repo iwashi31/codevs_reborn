@@ -20,6 +20,8 @@ private:
         bool operator<(const State& a) const;
     };
 
+    Logger logger;
+
     // 連鎖に繋がりそうな位置関係
     // 盤面の評価に使う
     const int DX_NEAR[3] = {1, 0, -1};

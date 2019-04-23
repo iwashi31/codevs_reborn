@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <limits>
 #include <string>
 #include <cstring>
@@ -56,10 +57,22 @@ extern const int EXPLODE_SCORE[];           // 爆発スコア
 using Pack = array<array<int, PACK_SIZE>, PACK_SIZE>;
 using RowField = array<array<int, FIELD_WIDTH>, FIELD_HEIGHT + PACK_SIZE + 1>;
 
-namespace logUtil {
-    static int isLocalCache = 0;
-    bool isLocal();
-}
+class Logger {
+public:
+    static bool writeFile;
+    static string fileName;
+
+    static void init();
+
+    void print(long long num);
+    void print(string str);
+    void print(const char* chr);
+
+    void printLine(long long num);
+    void printLine(string str);
+    void printLine(const char* chr);
+    void printLine();
+};
 
 class Point {
 public:

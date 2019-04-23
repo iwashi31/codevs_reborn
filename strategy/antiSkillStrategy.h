@@ -17,6 +17,8 @@ private:
         bool operator<(const State& a) const;
     };
 
+    Logger logger;
+
     Game* game;
 
 public:

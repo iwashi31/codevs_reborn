@@ -19,6 +19,8 @@ private:
         bool operator<(const State& a) const;
     };
 
+    Logger logger;
+
     enum class SearchType {
         MAXIMIZE_EXPLODE_BLOCK_NUM,
         INCREASE_GAGE

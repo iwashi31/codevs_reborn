@@ -15,7 +15,7 @@ string AntiSkillStrategy::getName() {
 }
 
 Action AntiSkillStrategy::getAction(Game &game) {
-    cerr << "call AntiSkill" << endl;
+    logger.printLine("call AntiSkill");
 
     this->game = &game;
 
@@ -75,11 +75,12 @@ Action AntiSkillStrategy::getAction(Game &game) {
 
     State bestState = q[0];
 
-    cerr << " chains:";
+    logger.print(" chains:");
     for (auto chain : bestState.chains) {
-        cerr << chain << "_";
+        logger.print(chain);
+        logger.print("_");
     }
-    cerr << endl;
+    logger.printLine();
     if (!bestState.actions.empty() && *max_element(all(bestState.chains)) >= 3) {
         return bestState.actions[0];
     }

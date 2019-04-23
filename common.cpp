@@ -416,13 +416,63 @@ const int EXPLODE_SCORE[] = {
         258031  // 160 blocks
 };
 
-bool logUtil::isLocal() {
-    if (isLocalCache == 0) {
-        auto fp = fopen(".local", "r");
-        isLocalCache = fp == nullptr ? -1 : 1;
-        fclose(fp);
+bool Logger::writeFile = false;
+string Logger::fileName{};
+
+void Logger::init() {
+    writeFile = true;
+    time_t t = time(nullptr);
+    char buf[64];
+    strftime(buf, sizeof(buf), "logs/%Y-%m-%d_%H-%M-%S.log", localtime(&t));
+    fileName = string(buf);
+}
+
+void Logger::print(long long num) {
+    cerr << num;
+
+    if (writeFile) {
+        ofstream fout(fileName, ios::app);
+        fout << num;
     }
-    return isLocalCache == 1;
+}
+
+void Logger::print(string str) {
+    cerr << str;
+
+    if (writeFile) {
+        ofstream fout(fileName, ios::app);
+        fout << str;
+    }
+}
+
+void Logger::print(const char* chr) {
+    print(move(string(chr)));
+}
+
+void Logger::printLine(long long num) {
+    cerr << num << endl;
+
+    if (writeFile) {
+        ofstream fout(fileName, ios::app);
+        fout << num << endl;
+    }
+}
+
+void Logger::printLine(string str) {
+    cerr << str << endl;
+
+    if (writeFile) {
+        ofstream fout(fileName, ios::app);
+        fout << str << endl;
+    }
+}
+
+void Logger::printLine(const char* chr) {
+    printLine(string(chr));
+}
+
+void Logger::printLine() {
+    printLine("");
 }
 
 Point::Point() = default;

@@ -18,6 +18,8 @@ private:
         bool operator<(const State& a) const;
     };
 
+    Logger logger;
+
     OnlyChainStrategy onlyChainStrategy;
     AntiSkillStrategy antiSkillStrategy;
 
