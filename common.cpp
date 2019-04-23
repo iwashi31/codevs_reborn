@@ -453,7 +453,7 @@ int Field::eraseBlocks() {
     // TODO: 高速化の余地がありそう
     vector<Point> erasedPoints;
     rep(y, field.size()) rep(x, FIELD_WIDTH) {
-        if (field[y][x] == 0) continue;
+        if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
         rep(directionIdx, 4) {
             int ix = x + DX[directionIdx];
             int iy = y + DY[directionIdx];
