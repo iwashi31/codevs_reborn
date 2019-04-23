@@ -5,6 +5,19 @@
 
 class SwitchableStrategy : public IStrategy {
 private:
+    struct State {
+        Player player;
+        long long score;
+        vector<Action> actions;
+        vector<int> chains;
+        ChainInfo chainInfo;
+
+        State();
+        State(Player& player, int score);
+
+        bool operator<(const State& a) const;
+    };
+
     OnlyChainStrategy onlyChainStrategy;
     AntiSkillStrategy antiSkillStrategy;
 
@@ -16,6 +29,7 @@ private:
     vector<Game> gameHistory;
 
     bool skillPrioritizeCheck();
+    void analyze();
 
 public:
     SwitchableStrategy();

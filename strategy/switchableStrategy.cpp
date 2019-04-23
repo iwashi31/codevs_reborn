@@ -6,6 +6,12 @@
 
 SwitchableStrategy::SwitchableStrategy() : game(nullptr) {}
 
+SwitchableStrategy::State::State() = default;
+SwitchableStrategy::State::State(Player& player, int score) : player(player), score(score) {}
+bool SwitchableStrategy::State::operator<(const SwitchableStrategy::State &a) const {
+    return score < a.score;
+}
+
 string SwitchableStrategy::getName() {
     return "iwashiAI_v10.21";
 }
@@ -16,7 +22,7 @@ Action SwitchableStrategy::getAction(Game &game) {
 
     cerr << "--- turn " << game.turn << " ---" << endl;
 
-    cerr << " ac:" << game.player[0].field.countAvailableCell() << "-" << game.player[1].field.countAvailableCell() << endl;
+    analyze();
 
     if (game.turn > 0
         && gameHistory[game.turn - 1].player[0].field.countNumberBlock() - game.player[0].field.countNumberBlock() >= 20) {
@@ -35,6 +41,62 @@ Action SwitchableStrategy::getAction(Game &game) {
     }
 
     return onlyChainStrategy.getAction(game);
+}
+
+void SwitchableStrategy::analyze() {
+    cerr << "start analyzing" << endl;
+
+    Player me = game->player[0];
+    Player enemy = game->player[1];
+
+    cerr << " ac:" << me.field.countAvailableCell() << "-" << enemy.field.countAvailableCell() << endl;
+
+    if (game->turn > 0) {
+        long long enemyScoreDiff = enemy.score - gameHistory[game->turn - 1].player[1].score;
+        if (enemyScoreDiff != 0) {
+            rep(i, 30) {
+                if (enemyScoreDiff == CHAIN_SCORE[i]) {
+                    cerr << " enemy chain! : " << i << endl;
+                    break;
+                }
+                if (i == 29) {
+                    cerr << " enemy bomb?" << endl;
+                }
+            }
+        }
+    }
+
+    auto analyzeNearChains = [&](Player player, string name) {
+        const int depth = 3;
+        vector<vector<State>> states(depth + 1);
+        states[0].push_back(State(player, 0));
+        rep(i, depth) {
+            for (auto &state : states[i]) {
+                state.player.fallObstacles();
+                rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+                    auto nextState = state;
+                    auto chainInfo = nextState.player.field.dropPackWithInfo(game->packs[game->turn + i], position, rotation);
+                    if (chainInfo.chainNum == -1) continue;
+                    nextState.actions.push_back(Action::createDropPackAction(position, rotation));
+                    nextState.chains.push_back(chainInfo.chainNum);
+                    states[i + 1].push_back(nextState);
+                }
+            }
+        }
+        cerr << " fchain(" << name << "):";
+        rep(i, depth) {
+            int maxChain = -1;
+            for (auto &state : states[i + 1]) {
+                maxChain = max(maxChain, state.chains.back());
+            }
+            cerr << maxChain << "_";
+        }
+        cerr << endl;
+    };
+
+    analyzeNearChains(me, "me");
+    analyzeNearChains(enemy, "en");
+
 }
 
 bool SwitchableStrategy::skillPrioritizeCheck() {
