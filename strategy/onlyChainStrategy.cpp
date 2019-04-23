@@ -12,7 +12,7 @@ OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), no
 OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string OnlyChainStrategy::getName() {
-    return "iwashiAI_v1.33";
+    return "iwashiAI_v1.34";
 }
 
 Action OnlyChainStrategy::getAction(Game &game) {
@@ -196,7 +196,7 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     }
 
     int startX, endX;
-    if (stackedBlockLines < 4) {
+    if (stackedBlockLines < 3) {
         startX = 2;
         endX = 7;
     } else {
@@ -298,11 +298,15 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
 long long OnlyChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
     int maxChain = 0;
 
+    int emptySideNum = 0;
     int maxHeight = 0;
     rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
         if (field[y][x] == 0) continue;
         maxHeight = max(maxHeight, y);
-        if (field[y][x] == OBSTACLE || !allowErase[field[y][x]]) continue;
+        if (field[y][x] == OBSTACLE) continue;
+        if (x > 0 && field[y][x - 1] != 0) emptySideNum++;
+        if (x < FIELD_WIDTH - 1 && field[y][x + 1] != 0) emptySideNum++;
+        if (!allowErase[field[y][x]]) continue;
         if (field[y + 1][x] == 0) continue;
         if ((x > 1 && field[y + 1][x - 1] == 0)
             || (x < FIELD_WIDTH - 1 && field[y + 1][x + 1] == 0)) {
@@ -313,7 +317,7 @@ long long OnlyChainStrategy::calcFieldScore(Field& field, vector<bool> &allowEra
         }
     }
 
-    long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10);
+    long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10) + emptySideNum;
     score = 10000 * score + field.countNumberBlock() * 100 + rng.rand() % 100;
 
     return score;
