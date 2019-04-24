@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.37";
+    return "iwashiAI_v1.38";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -38,6 +38,65 @@ Action ChainStrategy::getAction(Game &game) {
     if (bulkSearchFlag) {
         bulkSearchFlag = false;
         bulkSearch(15, min(18, max(10, 22 - 4 * bulkSearchCount)));
+    } else if (actionQueue.size() == 4) {
+        const int depth = 4;
+        vector<vector<State>> states(depth + 1);
+        vector<unordered_set<unsigned long long>> pushedHash(static_cast<unsigned int>(depth + 1));
+        vector<State> statePool;
+        states[0].push_back(State(game.player[0], 0));
+        rep(i, depth) {
+            for (auto &state : states[i]) {
+                state.player.fallObstacles();
+                rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+                    auto nextState = state;
+                    auto chainInfo = nextState.player.field.dropPackWithInfo(game.packs[game.turn + i], position, rotation);
+                    if (chainInfo.chainNum == -1) continue;
+
+                    nextState.actions.push_back(Action::createDropPackAction(position, rotation));
+                    nextState.chains.push_back(chainInfo.chainNum);
+
+                    if (chainInfo.chainNum >= 11) {
+                        nextState.chainInfo = chainInfo;
+                        statePool.push_back(nextState);
+                        continue;
+                    }
+
+                    if (i < depth - 1) states[i + 1].push_back(nextState);
+                }
+            }
+        }
+
+        assert(!statePool.empty());
+
+        sort(all(statePool), [](State &s1, State &s2) {
+            int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum - s1.player.obstacleStock;
+            int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum - s2.player.obstacleStock;
+            if (val1 == val2) {
+                if (s1.actions.size() - s1.chainInfo.robustNum == s2.actions.size() - s2.chainInfo.robustNum) {
+                    int b1 = s1.player.field.countNumberBlock();
+                    int b2 = s2.player.field.countNumberBlock();
+                    if (b1 == b2) {
+                        return s1.chainInfo.robustNum > s2.chainInfo.robustNum;
+                    }
+                    return b1 > b2;
+                }
+                return s1.actions.size() - s1.chainInfo.robustNum < s2.actions.size() - s2.chainInfo.robustNum;
+            }
+            return val1 > val2;
+        });
+        State bestState = statePool[0];
+
+        logger.print("  turn:");
+        logger.print(bestState.actions.size());
+        logger.print("  chn:");
+        logger.print(bestState.chainInfo.chainNum);
+        logger.print("  lft:");
+        logger.print(bestState.player.field.countNumberBlock());
+        logger.print("  rbst:");
+        logger.printLine(bestState.chainInfo.robustNum);
+
+        clearQueue();
+        for (auto &action : bestState.actions) actionQueue.push(action);
     }
 
     if (!actionQueue.empty()) {
@@ -202,8 +261,8 @@ void ChainStrategy::bulkSearch(int depth, double timeLimit) {
 
     int startX, endX;
     if (stackedBlockLines == 0) {
-        startX = 2;
-        endX = 7;
+        startX = 1;
+        endX = 6;
     } else {
         startX = 0;
         endX = FIELD_WIDTH - 1;
@@ -282,7 +341,6 @@ void ChainStrategy::bulkSearch(int depth, double timeLimit) {
     noBulkCount = 0;
 
     State bestState = statePool[0];
-    Action& bestAction = bestState.actions[0];
 
     logger.print("  turn:");
     logger.print(bestState.actions.size());
