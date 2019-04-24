@@ -1,7 +1,7 @@
 #include "common.h"
 #include "strategy/randomStrategy.h"
-#include "strategy/onlyChainStrategy.h"
-#include "strategy/prioritizeSkillStrategy.h"
+#include "strategy/chainStrategy.h"
+#include "strategy/skillStrategy.h"
 #include "strategy/antiSkillStrategy.h"
 #include "strategy/switchableStrategy.h"
 

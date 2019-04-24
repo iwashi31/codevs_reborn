@@ -20,7 +20,7 @@ private:
 
     Logger logger;
 
-    OnlyChainStrategy onlyChainStrategy;
+    ChainStrategy onlyChainStrategy;
     AntiSkillStrategy antiSkillStrategy;
 
     Game* game;

@@ -1,6 +1,6 @@
 #include "randomStrategy.h"
-#include "onlyChainStrategy.h"
-#include "prioritizeSkillStrategy.h"
+#include "chainStrategy.h"
+#include "skillStrategy.h"
 #include "antiSkillStrategy.h"
 #include "switchableStrategy.h"
 

@@ -1,11 +1,11 @@
-#ifndef CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
-#define CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
+#ifndef CODEVS_REBORN_CHAINSTRATEGY_H
+#define CODEVS_REBORN_CHAINSTRATEGY_H
 
 #include "../common.h"
 
 // 敵の状態は無視して、自分のスコアを最大化するように動く Strategy
 // 中身はビームサーチ
-class OnlyChainStrategy : public IStrategy {
+class ChainStrategy : public IStrategy {
 private:
     struct State {
         Player player;
@@ -41,8 +41,8 @@ private:
     long long calcFieldScore(Field& field, vector<bool> &allowErase);
 
 public:
-    OnlyChainStrategy();
-    OnlyChainStrategy(bool bulkSearchFlag);
+    ChainStrategy();
+    ChainStrategy(bool bulkSearchFlag);
 
     string getName() override;
     Action getAction(Game& game) override;
@@ -50,4 +50,4 @@ public:
     void clearQueue();
 };
 
-#endif //CODEVS_REBORN_BEAMSEARCHSTRATEGY_H
+#endif //CODEVS_REBORN_CHAINSTRATEGY_H

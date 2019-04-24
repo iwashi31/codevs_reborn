@@ -1,11 +1,11 @@
-#ifndef CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
-#define CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
+#ifndef CODEVS_REBORN_SKILLSTRATEGY_H
+#define CODEVS_REBORN_SKILLSTRATEGY_H
 
 #include "../common.h"
 
 // 敵の状態は無視して、自分のスコアを最大化するように動く Strategy
 // 中身はビームサーチ
-class PrioritizeSkillStrategy : public IStrategy {
+class SkillStrategy : public IStrategy {
 private:
     struct State {
         Player player;
@@ -34,10 +34,10 @@ private:
     int calcFieldScore(Player& player, int chain);
 
 public:
-    PrioritizeSkillStrategy();
+    SkillStrategy();
 
     string getName() override;
     Action getAction(Game& game) override;
 };
 
-#endif //CODEVS_REBORN_CHOKUDAISEARCHSTRATEGY_H
+#endif //CODEVS_REBORN_SKILLSTRATEGY_H

@@ -1,6 +1,6 @@
 #include "randomStrategy.h"
 #include "antiSkillStrategy.h"
-#include "onlyChainStrategy.h"
+#include "chainStrategy.h"
 
 AntiSkillStrategy::State::State() = default;
 AntiSkillStrategy::State::State(Player& player, int score) : player(player), score(score) {}
@@ -85,5 +85,5 @@ Action AntiSkillStrategy::getAction(Game &game) {
         return bestState.actions[0];
     }
 
-    return OnlyChainStrategy(false).getAction(game);
+    return ChainStrategy(false).getAction(game);
 }

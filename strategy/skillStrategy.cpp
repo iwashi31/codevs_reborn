@@ -1,20 +1,20 @@
 #include "../common.h"
-#include "prioritizeSkillStrategy.h"
+#include "skillStrategy.h"
 #include "randomStrategy.h"
 
-PrioritizeSkillStrategy::State::State() = default;
-PrioritizeSkillStrategy::State::State(Player& player, int score) : player(player), score(score) {}
-bool PrioritizeSkillStrategy::State::operator<(const PrioritizeSkillStrategy::State &a) const {
+SkillStrategy::State::State() = default;
+SkillStrategy::State::State(Player& player, int score) : player(player), score(score) {}
+bool SkillStrategy::State::operator<(const SkillStrategy::State &a) const {
     return score < a.score;
 }
 
-PrioritizeSkillStrategy::PrioritizeSkillStrategy() : game(nullptr) {}
+SkillStrategy::SkillStrategy() : game(nullptr) {}
 
-string PrioritizeSkillStrategy::getName() {
+string SkillStrategy::getName() {
     return "iwashiAI_v2.4";
 }
 
-Action PrioritizeSkillStrategy::getAction(Game &game) {
+Action SkillStrategy::getAction(Game &game) {
     this->game = &game;
 
     if (game.turn == 0) {
@@ -60,7 +60,7 @@ Action PrioritizeSkillStrategy::getAction(Game &game) {
     return chokudaiSearch(10, 0.3);
 }
 
-Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
+Action SkillStrategy::chokudaiSearch(int depth, double timeLimit) {
     int turn = game->turn;
     if (turn + depth > MAX_TURN_NUM) {
         depth = MAX_TURN_NUM - turn;
@@ -100,7 +100,7 @@ Action PrioritizeSkillStrategy::chokudaiSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-void PrioritizeSkillStrategy::bulkSearch(int depth, double timeLimit) {
+void SkillStrategy::bulkSearch(int depth, double timeLimit) {
     int turn = game->turn;
     if (turn + depth > MAX_TURN_NUM) {
         depth = MAX_TURN_NUM - turn;
@@ -144,7 +144,7 @@ void PrioritizeSkillStrategy::bulkSearch(int depth, double timeLimit) {
     logger.printLine(bestState.player.field.countExplodeBlockNum());
 }
 
-int PrioritizeSkillStrategy::calcFieldScore(Player& player, int chain) {
+int SkillStrategy::calcFieldScore(Player& player, int chain) {
     Field& field = player.field;
     int score = 0;
     score = 100 * (field.countExplodeBlockNum() + min(player.skillGage, 80));

@@ -1,21 +1,21 @@
 #include "../common.h"
-#include "onlyChainStrategy.h"
+#include "chainStrategy.h"
 #include "randomStrategy.h"
 
-OnlyChainStrategy::State::State() = default;
-OnlyChainStrategy::State::State(Player& player, int score) : player(player), score(score) {}
-bool OnlyChainStrategy::State::operator<(const OnlyChainStrategy::State &a) const {
+ChainStrategy::State::State() = default;
+ChainStrategy::State::State(Player& player, int score) : player(player), score(score) {}
+bool ChainStrategy::State::operator<(const ChainStrategy::State &a) const {
     return score < a.score;
 }
 
-OnlyChainStrategy::OnlyChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
-OnlyChainStrategy::OnlyChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
+ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
+ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
-string OnlyChainStrategy::getName() {
+string ChainStrategy::getName() {
     return "iwashiAI_v1.37";
 }
 
-Action OnlyChainStrategy::getAction(Game &game) {
+Action ChainStrategy::getAction(Game &game) {
     logger.printLine("call OnlyChain");
 
     this->game = &game;
@@ -122,11 +122,11 @@ Action OnlyChainStrategy::getAction(Game &game) {
     return singleSearch(5, 0.6);
 }
 
-void OnlyChainStrategy::clearQueue() {
+void ChainStrategy::clearQueue() {
     while (!actionQueue.empty()) actionQueue.pop();
 }
 
-Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
+Action ChainStrategy::singleSearch(int depth, double timeLimit) {
     int turn = game->turn;
     if (turn + depth > MAX_TURN_NUM) {
         depth = MAX_TURN_NUM - turn;
@@ -183,7 +183,7 @@ Action OnlyChainStrategy::singleSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
+void ChainStrategy::bulkSearch(int depth, double timeLimit) {
     logger.printLine(" bulk search!");
 
     clearQueue();
@@ -296,7 +296,7 @@ void OnlyChainStrategy::bulkSearch(int depth, double timeLimit) {
     for (auto &action : bestState.actions) actionQueue.push(action);
 }
 
-long long OnlyChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
+long long ChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
     int maxChain = 0;
 
     int emptySideNum = 0;
