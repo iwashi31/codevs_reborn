@@ -135,6 +135,9 @@ public:
     // 一番高いところにあるブロックの y 座標を返す
     int getMaxBlockHeight();
 
+    // 指定したセルの埋まりにくさを返す
+    int calcRobustNum(int x, int y);
+
     static void initHashSeed();
     unsigned long long getHash();
 

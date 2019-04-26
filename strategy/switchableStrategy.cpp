@@ -13,7 +13,7 @@ bool SwitchableStrategy::State::operator<(const SwitchableStrategy::State &a) co
 }
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.24";
+    return "iwashiAI_v10.25";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
@@ -51,7 +51,7 @@ Action SwitchableStrategy::getAction(Game &game) {
 
     if (isChained && !isChainedEnemy && skillPrioritizeCheck()) {
         int needTurn = (SKILL_GAGE_THRESHOLD - game.player[1].skillGage + INCREMENT_SKILL_GAGE - 1) / INCREMENT_SKILL_GAGE;
-        if (needTurn <= onlyChainStrategy.getQueueSize()) {
+        if (onlyChainStrategy.getQueueSize() > 0 && needTurn <= onlyChainStrategy.getQueueSize()) {
             logger.printLine(" bull chain!!");
         } else {
             onlyChainStrategy.clearQueue();

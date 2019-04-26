@@ -580,21 +580,14 @@ ChainInfo Field::dropWithInfo() {
     while (true) {
         int eraseNum;
         if (info.chainNum == 0) {
-            RowField prevField = field;
+            Field prevField = *this;
             freeFall();
             eraseNum = eraseBlocks();
             info.robustNum = [&]() {
                 rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
-                    if (prevField[y][x] != 0 && field[y][x] == 0) {
+                    if (prevField[y][x] != 0 && field[y][x] == 0 && prevField[y + 1][x] != 0) {
                         info.erasePoint = Point(x, y);
-                        REP(dy, -1, 2) {
-                            int ny = y + dy;
-                            if (ny < 0) continue;
-                            if ((x - 1 >= 0 && prevField[ny][x - 1] == 0)
-                                || (x + 1 < FIELD_WIDTH && prevField[ny][x + 1] == 0)) {
-                                return 1 - dy;
-                            }
-                        }
+                        return prevField.calcRobustNum(x, y);
                     }
                 }
                 return -1;
@@ -689,6 +682,18 @@ int Field::getMaxBlockHeight() {
         if (field[y][x] != 0) return y;
     }
     return -1;
+}
+
+int Field::calcRobustNum(int x, int y) {
+    if (field[y][x] == 0 || field[y][x] == OBSTACLE) return -1;
+    int ret = -1;
+    rep(ty, FIELD_HEIGHT) {
+        if ((x > 0 && field[ty][x - 1] == 0) || (x < FIELD_WIDTH - 1 && field[ty][x + 1] == 0)) {
+            ret = y - ty + 1;
+            break;
+        }
+    }
+    return ret;
 }
 
 void Field::initHashSeed() {

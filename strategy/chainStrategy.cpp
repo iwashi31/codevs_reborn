@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.39";
+    return "iwashiAI_v1.40";
 }
 
 Action ChainStrategy::getAction(Game &game) {
