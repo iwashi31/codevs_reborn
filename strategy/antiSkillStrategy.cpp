@@ -20,6 +20,7 @@ Action AntiSkillStrategy::getAction(Game &game) {
     this->game = &game;
 
     if (game.player[0].skillGage >= SKILL_GAGE_THRESHOLD && game.player[0].field.countExplodeBlockNum() > 0) {
+        logger.printLine(" use bomb");
         return Action::createExplodeAction();
     }
 

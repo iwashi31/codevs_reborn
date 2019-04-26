@@ -13,7 +13,7 @@ bool SwitchableStrategy::State::operator<(const SwitchableStrategy::State &a) co
 }
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.23";
+    return "iwashiAI_v10.24";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
@@ -37,9 +37,26 @@ Action SwitchableStrategy::getAction(Game &game) {
         isChainedEnemy = true;
     }
 
-    if (isChained && !isChainedEnemy && skillPrioritizeCheck()) {
+    if (!actionQueue.empty()) {
         onlyChainStrategy.clearQueue();
-        return antiSkillStrategy.getAction(game);
+
+        logger.print(" q:");
+        rep(i, actionQueue.size()) logger.print("*");
+        logger.printLine();
+
+        Action action = actionQueue.front();
+        actionQueue.pop();
+        return action;
+    }
+
+    if (isChained && !isChainedEnemy && skillPrioritizeCheck()) {
+        int needTurn = (SKILL_GAGE_THRESHOLD - game.player[1].skillGage + INCREMENT_SKILL_GAGE - 1) / INCREMENT_SKILL_GAGE;
+        if (needTurn <= onlyChainStrategy.getQueueSize()) {
+            logger.printLine(" bull chain!!");
+        } else {
+            onlyChainStrategy.clearQueue();
+            return antiSkillStrategy.getAction(game);
+        }
     }
 
     return onlyChainStrategy.getAction(game);
@@ -89,21 +106,50 @@ void SwitchableStrategy::analyze() {
                 }
             }
         }
+
+        vector<State> bestStates(depth);
         logger.print(" fchain(" + name + "):");
         rep(i, depth) {
-            int maxChain = -1;
             for (auto &state : states[i + 1]) {
-                maxChain = max(maxChain, state.chains.back());
+                if (bestStates[i].chains.empty() || bestStates[i].chains.back() < state.chains.back()) {
+                    bestStates[i] = state;
+                }
             }
-            logger.print(maxChain);
+            logger.print(bestStates[i].chains.empty() ? -1 : bestStates[i].chains.back());
             logger.print("_");
         }
         logger.printLine();
+        return bestStates;
     };
 
-    analyzeNearChains(me, "me");
-    analyzeNearChains(enemy, "en");
+    auto myBestStates = analyzeNearChains(me, "me");
+    auto enemyBestStates = analyzeNearChains(enemy, "en");
 
+    if (!enemyBestStates[2].chains.empty() && enemyBestStates[0].chains.back() <= 5 && !myBestStates[0].chains.empty() && CHAIN_SCORE[myBestStates[0].chains.back()] / 2 + game->player[1].obstacleStock >= 10) {
+        const int depth = 3;
+        vector<vector<State>> states(depth + 1);
+        states[0].push_back(State(game->player[1], 0));
+        rep(i, depth) {
+            for (auto &state : states[i]) {
+                state.player.fallObstacles();
+                rep(position, FIELD_WIDTH - 1) rep(rotation, 4) {
+                    auto nextState = state;
+                    auto chainInfo = nextState.player.field.dropPackWithInfo(game->packs[game->turn + i], position, rotation);
+                    if (chainInfo.chainNum == -1) continue;
+                    if (i == 0) nextState.player.obstacleStock += CHAIN_SCORE[myBestStates[0].chains.back()] / 2;
+                    nextState.actions.push_back(Action::createDropPackAction(position, rotation));
+                    nextState.chains.push_back(chainInfo.chainNum);
+                    states[i + 1].push_back(nextState);
+                }
+            }
+        }
+        bool checkmate = states[depth].empty();
+        logger.printLine(" check");
+        if (checkmate) {
+            logger.printLine("  checkmate!");
+            actionQueue.push(myBestStates[0].actions[0]);
+        }
+    }
 }
 
 bool SwitchableStrategy::skillPrioritizeCheck() {

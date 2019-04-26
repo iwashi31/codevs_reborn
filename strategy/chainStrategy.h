@@ -37,7 +37,7 @@ private:
     queue<Action> actionQueue;
 
     Action singleSearch(int depth, double timeLimit);
-    void bulkSearch(int depth, double timeLimit);
+    void bulkSearch(int depth, int minChain, double timeLimit);
     long long calcFieldScore(Field& field, vector<bool> &allowErase);
 
 public:
@@ -47,6 +47,7 @@ public:
     string getName() override;
     Action getAction(Game& game) override;
 
+    int getQueueSize();
     void clearQueue();
 };
 

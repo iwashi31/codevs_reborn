@@ -29,6 +29,7 @@ private:
     bool isChained;
     bool isChainedEnemy;
     vector<Game> gameHistory;
+    queue<Action> actionQueue;
 
     bool skillPrioritizeCheck();
     void analyze();

@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.38";
+    return "iwashiAI_v1.39";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -37,7 +37,7 @@ Action ChainStrategy::getAction(Game &game) {
 
     if (bulkSearchFlag) {
         bulkSearchFlag = false;
-        bulkSearch(15, min(18, max(10, 22 - 4 * bulkSearchCount)));
+        bulkSearch(17, game.turn == 0 ? 13: 11, min(17, max(10, 18 - 4 * bulkSearchCount)));
     } else if (actionQueue.size() == 4) {
         const int depth = 4;
         vector<vector<State>> states(depth + 1);
@@ -55,7 +55,7 @@ Action ChainStrategy::getAction(Game &game) {
                     nextState.actions.push_back(Action::createDropPackAction(position, rotation));
                     nextState.chains.push_back(chainInfo.chainNum);
 
-                    if (chainInfo.chainNum >= 11) {
+                    if (chainInfo.chainNum >= (bulkSearchCount <= 1 ? 13 : 11)) {
                         nextState.chainInfo = chainInfo;
                         statePool.push_back(nextState);
                         continue;
@@ -181,6 +181,10 @@ Action ChainStrategy::getAction(Game &game) {
     return singleSearch(5, 0.6);
 }
 
+int ChainStrategy::getQueueSize() {
+    return actionQueue.size();
+}
+
 void ChainStrategy::clearQueue() {
     while (!actionQueue.empty()) actionQueue.pop();
 }
@@ -242,7 +246,7 @@ Action ChainStrategy::singleSearch(int depth, double timeLimit) {
     return bestAction;
 }
 
-void ChainStrategy::bulkSearch(int depth, double timeLimit) {
+void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
     logger.printLine(" bulk search!");
 
     clearQueue();
@@ -268,7 +272,7 @@ void ChainStrategy::bulkSearch(int depth, double timeLimit) {
         endX = FIELD_WIDTH - 1;
     }
 
-    const int lowerChainNum = 11;
+    const int lowerChainNum = minChain;
 
     Timer timer;
     vector<set<State>> q(static_cast<unsigned int>(depth + 1));
