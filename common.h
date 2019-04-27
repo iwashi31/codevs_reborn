@@ -108,8 +108,12 @@ private:
     // ブロックがデンジャーゾーンに達していないかを調べる
     bool isAlive();
 
+    int columnHeight[FIELD_WIDTH];
+
 public:
     Field();
+
+    void input(istream &is);
 
     // パックを指定の位置に落とす
     // 返り値は連鎖数。ただし、デンジャーゾーンを超えた場合 -1 が返る
@@ -117,6 +121,8 @@ public:
     int drop();
     ChainInfo dropPackWithInfo(const Pack& pack, int position, int rotation);
     ChainInfo dropWithInfo();
+
+    void fallObstacle();
 
     // 点 (x, y) がフィールド内の点か否かを返す
     bool inField(int x, int y);

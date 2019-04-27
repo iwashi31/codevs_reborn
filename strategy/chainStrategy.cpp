@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.41";
+    return "iwashiAI_v1.42";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -220,7 +220,7 @@ Action ChainStrategy::singleSearch(int depth, double timeLimit) {
 
             REP(position, startX, endX) rep(rotation, 4) {
                 auto nextState = state;
-                state.player.fallObstacles();
+                nextState.player.fallObstacles();
                 int chain = nextState.player.field.dropPack(game->packs[turn + i], position, rotation);
                 if (chain == -1) continue;
 
@@ -319,6 +319,8 @@ void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
             }
         }
     }
+
+    // logger.printLine("width:" + to_string(width));
 
     if (statePool.empty()) {
         logger.printLine("  failed");

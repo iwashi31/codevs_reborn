@@ -480,29 +480,40 @@ Point::Point(int x, int y) : x(x), y(y) {}
 
 Field::Field() {
     memset(columnUpdated, false, sizeof(columnUpdated));
+    memset(columnHeight, 0, sizeof(columnHeight));
 }
 
 long long Field::hashSeed[FIELD_HEIGHT + PACK_SIZE + 1][FIELD_WIDTH][OBSTACLE + 1];
+
+void Field::input(istream &is) {
+    memset(columnHeight, 0, sizeof(columnHeight));
+    for (int y = FIELD_HEIGHT + PACK_SIZE; y >= FIELD_HEIGHT; y--) rep(x, FIELD_WIDTH) field[y][x] = 0;
+    for (int y = FIELD_HEIGHT - 1; y >= 0; y--) rep(x, FIELD_WIDTH) {
+            is >> field[y][x];
+            if (field[y][x] != 0 && columnHeight[x] == 0) columnHeight[x] = y + 1;
+        }
+}
 
 void Field::freeFall() {
     rep(x, FIELD_WIDTH) {
         if (!columnUpdated[x]) continue;
         columnUpdated[x] = false;
         int bottom = 0;
-        rep(y, field.size()) {
+        rep(y, columnHeight[x]) {
             if (field[y][x] != 0) {
                 field[bottom][x] = field[y][x];
                 if (bottom != y) field[y][x] = 0;
                 bottom++;
             }
         }
+        columnHeight[x] = bottom;
     }
 }
 
 int Field::eraseBlocks() {
     // TODO: 高速化の余地がありそう
     vector<Point> erasedPoints;
-    rep(y, field.size()) rep(x, FIELD_WIDTH) {
+    rep(x, FIELD_WIDTH) rep(y, columnHeight[x]) {
         if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
         rep(directionIdx, 4) {
             int ix = x + DX[directionIdx];
@@ -543,27 +554,31 @@ int Field::dropPack(const Pack &pack, int position, int rotation) {
 
 ChainInfo Field::dropPackWithInfo(const Pack &pack, int position, int rotation) {
     assert(position >= 0 && position < FIELD_WIDTH - 1);
+    assert(columnHeight[position] + 1 < FIELD_HEIGHT + PACK_SIZE + 1);
     if (rotation == 0) {
-        field[FIELD_HEIGHT + 1][position] = pack[0][0];
-        field[FIELD_HEIGHT + 2][position] = pack[1][0];
-        field[FIELD_HEIGHT + 2][position + 1] = pack[1][1];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[0][1];
+        field[columnHeight[position]][position]               = pack[0][0];
+        field[columnHeight[position] + 1][position]           = pack[1][0];
+        field[columnHeight[position + 1] + 1][position + 1]   = pack[1][1];
+        field[columnHeight[position + 1]][position + 1]       = pack[0][1];
     } else if (rotation == 1) {
-        field[FIELD_HEIGHT + 1][position] = pack[0][1];
-        field[FIELD_HEIGHT + 2][position] = pack[0][0];
-        field[FIELD_HEIGHT + 2][position + 1] = pack[1][0];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[1][1];
+        field[columnHeight[position]][position]               = pack[0][1];
+        field[columnHeight[position] + 1][position]           = pack[0][0];
+        field[columnHeight[position + 1] + 1][position + 1]   = pack[1][0];
+        field[columnHeight[position + 1]][position + 1]       = pack[1][1];
     } else if (rotation == 2) {
-        field[FIELD_HEIGHT + 1][position] = pack[1][1];
-        field[FIELD_HEIGHT + 2][position] = pack[0][1];
-        field[FIELD_HEIGHT + 2][position + 1] = pack[0][0];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[1][0];
+        field[columnHeight[position]][position]               = pack[1][1];
+        field[columnHeight[position] + 1][position]           = pack[0][1];
+        field[columnHeight[position + 1] + 1][position + 1]   = pack[0][0];
+        field[columnHeight[position + 1]][position + 1]       = pack[1][0];
     } else if (rotation == 3) {
-        field[FIELD_HEIGHT + 1][position] = pack[1][0];
-        field[FIELD_HEIGHT + 2][position] = pack[1][1];
-        field[FIELD_HEIGHT + 2][position + 1] = pack[0][1];
-        field[FIELD_HEIGHT + 1][position + 1] = pack[0][0];
+        field[columnHeight[position]][position]               = pack[1][0];
+        field[columnHeight[position] + 1][position]           = pack[1][1];
+        field[columnHeight[position + 1] + 1][position + 1]   = pack[0][1];
+        field[columnHeight[position + 1]][position + 1]       = pack[0][0];
     } else assert(false);
+
+    columnHeight[position] += 2;
+    columnHeight[position + 1] += 2;
 
     columnUpdated[position] = true;
     columnUpdated[position + 1] = true;
@@ -607,6 +622,13 @@ ChainInfo Field::dropWithInfo() {
     return info;
 }
 
+void Field::fallObstacle() {
+    rep(x, FIELD_WIDTH) {
+        field[columnHeight[x]][x] = OBSTACLE;
+        columnHeight[x]++;
+    }
+}
+
 void Field::update(int x, int y, int block) {
     columnUpdated[x] = true;
     field[y][x] = block;
@@ -614,7 +636,7 @@ void Field::update(int x, int y, int block) {
 
 int Field::countNumberBlock() {
     int cnt = 0;
-    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+    rep(x, FIELD_WIDTH) rep(y, columnHeight[x]) {
         if (field[y][x] >= 1 && field[y][x] <= 9) cnt++;
     }
     return cnt;
@@ -622,15 +644,15 @@ int Field::countNumberBlock() {
 
 int Field::countBlock() {
     int cnt = 0;
-    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
-        if (field[y][x] != 0) cnt++;
+    rep(x, FIELD_WIDTH) {
+        cnt += columnHeight[x];
     }
     return cnt;
 }
 
 int Field::countExplodeBlockNum() {
     int cnt = 0;
-    rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+    rep(x, FIELD_WIDTH) rep(y, columnHeight[x]) {
             if (field[y][x] == 0 || field[y][x] == OBSTACLE) continue;
             cnt += [&]() {
                 for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) {
@@ -729,8 +751,7 @@ void Player::input(istream& is) {
     is >> obstacleStock;
     is >> skillGage;
     is >> score;
-    for (int y = FIELD_HEIGHT + PACK_SIZE; y >= FIELD_HEIGHT; y--) rep(x, FIELD_WIDTH) field[y][x] = 0;
-    for (int y = FIELD_HEIGHT - 1; y >= 0; y--) rep(x, FIELD_WIDTH) is >> field[y][x];
+    field.input(is);
     string end;
     is >> end;
 }
@@ -738,7 +759,7 @@ void Player::input(istream& is) {
 void Player::fallObstacles() {
     if (obstacleStock < FIELD_WIDTH) return;
     obstacleStock -= FIELD_WIDTH;
-    rep(x, FIELD_WIDTH) field.update(x, FIELD_HEIGHT, OBSTACLE);
+    field.fallObstacle();
 }
 
 void Player::increaseSkillGage() {
