@@ -13,7 +13,7 @@ bool SwitchableStrategy::State::operator<(const SwitchableStrategy::State &a) co
 }
 
 string SwitchableStrategy::getName() {
-    return "iwashiAI_v10.25";
+    return "iwashiAI_v10.26";
 }
 
 Action SwitchableStrategy::getAction(Game &game) {
