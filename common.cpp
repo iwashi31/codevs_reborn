@@ -603,7 +603,6 @@ ChainInfo Field::dropWithInfo(int position) {
                 prevField[columnHeight[position + 1] - 2][position + 1] = 0;
                 prevField.columnHeight[position] -= 2;
                 prevField.columnHeight[position + 1] -= 2;
-                prevField.packPosition = position;
             }
             freeFall();
             eraseNum = eraseBlocks();
@@ -719,8 +718,8 @@ int Field::calcRobustNum(int x, int y) {
     if (field[y][x] == 0 || field[y][x] == OBSTACLE) return -1;
     int ret = -1;
     rep(ty, FIELD_HEIGHT) {
-        if ((x > 0 && (x - 1 == packPosition || x - 1 == packPosition + 1) && field[ty][x - 1] == 0)
-            || (x < FIELD_WIDTH - 1 && (x + 1 == packPosition || x + 1 == packPosition + 1) && field[ty][x + 1] == 0)) {
+        if ((x > 0 && field[ty][x - 1] == 0)
+            || (x < FIELD_WIDTH - 1 && field[ty][x + 1] == 0)) {
             ret = y - ty + 1;
             break;
         }

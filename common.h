@@ -112,7 +112,6 @@ private:
     ChainInfo dropWithInfo(int position);
 
     int columnHeight[FIELD_WIDTH];
-    int packPosition;
 
 public:
     Field();
