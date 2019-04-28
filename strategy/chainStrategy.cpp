@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.42";
+    return "iwashiAI_v1.43";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -37,7 +37,7 @@ Action ChainStrategy::getAction(Game &game) {
 
     if (bulkSearchFlag) {
         bulkSearchFlag = false;
-        bulkSearch(17, game.turn == 0 ? 13: 11, min(17, max(10, 18 - 4 * bulkSearchCount)));
+        bulkSearch(15, game.turn == 0 ? 13: 11, min(17, max(10, 18 - 4 * bulkSearchCount)));
     } else if (actionQueue.size() == 4) {
         const int depth = 4;
         vector<vector<State>> states(depth + 1);

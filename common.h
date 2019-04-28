@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <random>
 #include <ctime>
+#include <memory>
 
 using namespace std;
 
@@ -108,7 +109,10 @@ private:
     // ブロックがデンジャーゾーンに達していないかを調べる
     bool isAlive();
 
+    ChainInfo dropWithInfo(int position);
+
     int columnHeight[FIELD_WIDTH];
+    int packPosition;
 
 public:
     Field();
@@ -120,7 +124,6 @@ public:
     int dropPack(const Pack& pack, int position, int rotation);
     int drop();
     ChainInfo dropPackWithInfo(const Pack& pack, int position, int rotation);
-    ChainInfo dropWithInfo();
 
     void fallObstacle();
 

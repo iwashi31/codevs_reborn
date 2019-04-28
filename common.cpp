@@ -583,23 +583,32 @@ ChainInfo Field::dropPackWithInfo(const Pack &pack, int position, int rotation) 
     columnUpdated[position] = true;
     columnUpdated[position + 1] = true;
 
-    return dropWithInfo();
+    return dropWithInfo(position);
 }
 
 int Field::drop() {
-    return dropWithInfo().chainNum;
+    return dropWithInfo(-1).chainNum;
 }
 
-ChainInfo Field::dropWithInfo() {
+ChainInfo Field::dropWithInfo(int position) {
     ChainInfo info;
     while (true) {
         int eraseNum;
         if (info.chainNum == 0) {
             Field prevField = *this;
+            if (position != -1) {
+                prevField[columnHeight[position] - 1][position] = 0;
+                prevField[columnHeight[position] - 2][position] = 0;
+                prevField[columnHeight[position + 1] - 1][position + 1] = 0;
+                prevField[columnHeight[position + 1] - 2][position + 1] = 0;
+                prevField.columnHeight[position] -= 2;
+                prevField.columnHeight[position + 1] -= 2;
+                prevField.packPosition = position;
+            }
             freeFall();
             eraseNum = eraseBlocks();
             info.robustNum = [&]() {
-                rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
+                rep(x, FIELD_WIDTH) rep(y, prevField.columnHeight[x]) {
                     if (prevField[y][x] != 0 && field[y][x] == 0 && prevField[y + 1][x] != 0) {
                         info.erasePoint = Point(x, y);
                         return prevField.calcRobustNum(x, y);
@@ -710,7 +719,8 @@ int Field::calcRobustNum(int x, int y) {
     if (field[y][x] == 0 || field[y][x] == OBSTACLE) return -1;
     int ret = -1;
     rep(ty, FIELD_HEIGHT) {
-        if ((x > 0 && field[ty][x - 1] == 0) || (x < FIELD_WIDTH - 1 && field[ty][x + 1] == 0)) {
+        if ((x > 0 && (x - 1 == packPosition || x - 1 == packPosition + 1) && field[ty][x - 1] == 0)
+            || (x < FIELD_WIDTH - 1 && (x + 1 == packPosition || x + 1 == packPosition + 1) && field[ty][x + 1] == 0)) {
             ret = y - ty + 1;
             break;
         }
