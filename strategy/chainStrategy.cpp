@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.44";
+    return "iwashiAI_v1.45";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -267,8 +267,8 @@ void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
         rep(i, 10) allowErase[i] = true;
     } else {
         rep(i, 10) allowErase[i] = false;
-        REP(t, 9, 11) {
-            rep(y, PACK_SIZE) rep(x, PACK_SIZE) allowErase[game->packs[t][y][x]] = true;
+        REP(t, 10, 13) {
+            rep(y, PACK_SIZE) rep(x, PACK_SIZE) allowErase[10 - game->packs[t][y][x]] = true;
         }
     }
 
