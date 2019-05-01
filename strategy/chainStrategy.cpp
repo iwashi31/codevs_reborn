@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.45";
+    return "iwashiAI_v1.46";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -76,7 +76,7 @@ Action ChainStrategy::getAction(Game &game) {
 
             int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum - s1.player.obstacleStock * 8 / 10;
             int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum - s2.player.obstacleStock * 8 / 10;
-            if (game.turn == 0) {
+            if (bulkSearchCount <= 1) {
                 val1 -= s1.chainInfo.robustNum <= 1 ? 100 : 0;
                 val2 -= s2.chainInfo.robustNum <= 1 ? 100 : 0;
             }
@@ -342,7 +342,7 @@ void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
 
         int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum - s1.player.obstacleStock * 8 / 10;
         int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum - s2.player.obstacleStock * 8 / 10;
-        if (game->turn == 0) {
+        if (bulkSearchCount <= 1) {
             val1 -= s1.chainInfo.robustNum <= 1 ? 100 : 0;
             val2 -= s2.chainInfo.robustNum <= 1 ? 100 : 0;
         }
