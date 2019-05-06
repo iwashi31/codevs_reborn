@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.46";
+    return "iwashiAI_v1.47";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -398,8 +398,8 @@ long long ChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) 
         }
     }
 
-    long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10) + emptySideNum;
-    score = 10000 * score + field.countNumberBlock() * 100 + rng.rand() % 100;
+    long long score = CHAIN_SCORE[maxChain] * 10 - max(0, maxHeight - 10) + emptySideNum + field.countNumberBlock();
+    score = 10000 * score + rng.rand() % 100;
 
     return score;
 }
