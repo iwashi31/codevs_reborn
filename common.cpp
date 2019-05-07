@@ -528,13 +528,14 @@ int Field::eraseBlocks() {
         }
     }
 
+    int cnt = 0;
     for (auto p : erasedPoints) {
+        cnt += field[p.y][p.x] != 0;
         field[p.y][p.x] = 0;
         columnUpdated[p.x] = true;
     }
 
-    // TODO: 重複カウントの修正
-    return erasedPoints.size();
+    return cnt;
 }
 
 bool Field::isAlive() {

@@ -12,7 +12,7 @@ ChainStrategy::ChainStrategy() : game(nullptr), bulkSearchFlag(true), noBulkCoun
 ChainStrategy::ChainStrategy(bool bulkSearchFlag) : game(nullptr), bulkSearchFlag(bulkSearchFlag), noBulkCount(0), prevObstacleStock(0), bulkSearchCount(0), stackedBlockLines(0) {}
 
 string ChainStrategy::getName() {
-    return "iwashiAI_v1.46";
+    return "iwashiAI_v1.48";
 }
 
 Action ChainStrategy::getAction(Game &game) {
@@ -71,15 +71,21 @@ Action ChainStrategy::getAction(Game &game) {
         assert(!statePool.empty());
 
         sort(all(statePool), [&](State &s1, State &s2) {
-            if (s1.chainInfo.chainNum >= lowerChainNum && s2.chainInfo.chainNum < lowerChainNum) return true;
-            if (s2.chainInfo.chainNum >= lowerChainNum && s1.chainInfo.chainNum < lowerChainNum) return false;
-
             int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum - s1.player.obstacleStock * 8 / 10;
             int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum - s2.player.obstacleStock * 8 / 10;
+
+            if (s1.chainInfo.chainNum < lowerChainNum) val1 -= 1000;
+            if (s2.chainInfo.chainNum < lowerChainNum) val2 -= 1000;
+
             if (bulkSearchCount <= 1) {
                 val1 -= s1.chainInfo.robustNum <= 1 ? 100 : 0;
                 val2 -= s2.chainInfo.robustNum <= 1 ? 100 : 0;
+            } else {
+                val1 -= s1.chainInfo.robustNum <= 0 ? 100 : 0;
+                val2 -= s2.chainInfo.robustNum <= 0 ? 100 : 0;
             }
+            if (s1.actions.size() >= 14) val1 -= 150;
+            if (s2.actions.size() >= 14) val2 -= 150;
             if (val1 == val2) {
                 if (s1.actions.size() - s1.chainInfo.robustNum == s2.actions.size() - s2.chainInfo.robustNum) {
                     int b1 = s1.player.field.countNumberBlock();
@@ -337,15 +343,21 @@ void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
     }
 
     sort(all(statePool), [&](State &s1, State &s2) {
-        if (s1.chainInfo.chainNum >= lowerChainNum && s2.chainInfo.chainNum < lowerChainNum) return true;
-        if (s2.chainInfo.chainNum >= lowerChainNum && s1.chainInfo.chainNum < lowerChainNum) return false;
-
         int val1 = (2 * s1.chainInfo.chainNum - 3 * s1.actions.size()) * 2 + s1.chainInfo.robustNum - s1.player.obstacleStock * 8 / 10;
         int val2 = (2 * s2.chainInfo.chainNum - 3 * s2.actions.size()) * 2 + s2.chainInfo.robustNum - s2.player.obstacleStock * 8 / 10;
+
+        if (s1.chainInfo.chainNum < lowerChainNum) val1 -= 1000;
+        if (s2.chainInfo.chainNum < lowerChainNum) val2 -= 1000;
+
         if (bulkSearchCount <= 1) {
             val1 -= s1.chainInfo.robustNum <= 1 ? 100 : 0;
             val2 -= s2.chainInfo.robustNum <= 1 ? 100 : 0;
+        } else {
+            if (s1.actions.size() > 10) val1 -= s1.chainInfo.robustNum <= 0 ? 100 : 0;
+            if (s2.actions.size() > 10) val2 -= s2.chainInfo.robustNum <= 0 ? 100 : 0;
         }
+        if (s1.actions.size() >= 14) val1 -= 150;
+        if (s2.actions.size() >= 14) val2 -= 150;
         if (val1 == val2) {
             if (s1.actions.size() - s1.chainInfo.robustNum == s2.actions.size() - s2.chainInfo.robustNum) {
                 int b1 = s1.player.field.countNumberBlock();
@@ -377,7 +389,7 @@ void ChainStrategy::bulkSearch(int depth, int minChain, double timeLimit) {
 }
 
 long long ChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) {
-    int maxChain = 0;
+    long long maxScore = 0;
 
     int emptySideNum = 0;
     int maxHeight = 0;
@@ -393,13 +405,13 @@ long long ChainStrategy::calcFieldScore(Field& field, vector<bool> &allowErase) 
             || (x < FIELD_WIDTH - 1 && field[y + 1][x + 1] == 0)) {
             Field tmpField = field;
             tmpField.update(x, y, 0);
-            int chain = tmpField.drop();
-            maxChain = max(maxChain, chain);
+            auto chainInfo = tmpField.dropWithInfo(-1);
+            maxScore = max(maxScore, CHAIN_SCORE[chainInfo.chainNum] * 10 - chainInfo.eraseBlockNum);
         }
     }
 
-    long long score = CHAIN_SCORE[maxChain] - max(0, maxHeight - 10) + emptySideNum;
-    score = 10000 * score + field.countNumberBlock() * 100 + rng.rand() % 100;
+    long long score = maxScore - max(0, maxHeight - 10) + emptySideNum;
+    score = 10000 * score + rng.rand() % 100;
 
     return score;
 }

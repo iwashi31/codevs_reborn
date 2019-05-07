@@ -109,8 +109,6 @@ private:
     // ブロックがデンジャーゾーンに達していないかを調べる
     bool isAlive();
 
-    ChainInfo dropWithInfo(int position);
-
     int columnHeight[FIELD_WIDTH];
 
 public:
@@ -123,6 +121,7 @@ public:
     int dropPack(const Pack& pack, int position, int rotation);
     int drop();
     ChainInfo dropPackWithInfo(const Pack& pack, int position, int rotation);
+    ChainInfo dropWithInfo(int position);
 
     void fallObstacle();
 
