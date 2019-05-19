@@ -608,7 +608,7 @@ ChainInfo Field::dropWithInfo(int position) {
             freeFall();
             eraseNum = eraseBlocks();
             info.robustNum = [&]() {
-                rep(x, FIELD_WIDTH) rep(y, prevField.columnHeight[x]) {
+                rep(y, FIELD_HEIGHT) rep(x, FIELD_WIDTH) {
                     if (prevField[y][x] != 0 && field[y][x] == 0 && prevField[y + 1][x] != 0) {
                         info.erasePoint = Point(x, y);
                         return prevField.calcRobustNum(x, y);
